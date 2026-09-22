@@ -1,0 +1,7 @@
+S. No.	Project / Client	Location	Built-up Area
+1	Jaleel Complex  	RT Nagar	32,000 sq ft
+2	Guzdar Apartment	Banaswadi	9,000 sq ft
+3	Asif Apartment	        Fraser Town	8,000 sq ft
+4	Farooq Apartment	HBR Layout	11,000 sq ft
+5	Ravine Villa	        Indiranagar	20,000 sq ft
+6	Saeed Apartment	        Yasin Nagar	3,500 sq ft
