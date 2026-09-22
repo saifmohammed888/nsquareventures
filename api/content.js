@@ -3,6 +3,7 @@ const path = require('path');
 const vm = require('vm');
 
 const CONTENT_PATH = 'cms/content.json';
+const LOCAL_CONTENT_PATH = path.join(process.cwd(), 'cms-content.local.json');
 
 function readScriptData(file, globalName){
   const code = fs.readFileSync(path.join(process.cwd(), file), 'utf8');
@@ -33,6 +34,9 @@ function authorized(req){
 }
 
 async function readBlobContent(){
+  if(!process.env.BLOB_READ_WRITE_TOKEN && fs.existsSync(LOCAL_CONTENT_PATH)){
+    return JSON.parse(fs.readFileSync(LOCAL_CONTENT_PATH, 'utf8'));
+  }
   if(!process.env.BLOB_READ_WRITE_TOKEN) return null;
   const { head } = await import('@vercel/blob');
   try{
@@ -47,9 +51,8 @@ async function readBlobContent(){
 
 async function writeBlobContent(content){
   if(!process.env.BLOB_READ_WRITE_TOKEN){
-    const error = new Error('BLOB_READ_WRITE_TOKEN is not configured.');
-    error.statusCode = 503;
-    throw error;
+    fs.writeFileSync(LOCAL_CONTENT_PATH, JSON.stringify(content, null, 2));
+    return { url: LOCAL_CONTENT_PATH };
   }
   const { put } = await import('@vercel/blob');
   return put(CONTENT_PATH, JSON.stringify(content, null, 2), {

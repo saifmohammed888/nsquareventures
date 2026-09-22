@@ -9,81 +9,97 @@
 <body>
 <main class="shell">
   <section class="login" id="loginPanel">
-    <p class="kicker">Nsquare CMS</p>
-    <h1>Content Manager</h1>
-    <p>Manage projects, blogs, site images and uploaded assets.</p>
+    <p class="kicker">Private Admin</p>
+    <h1>Nsquare Content Manager</h1>
+    <p>Update the website without touching code. Use the local password <b>admin123</b> while previewing on your machine.</p>
     <form id="loginForm">
-      <label>Password</label>
+      <label for="password">Password</label>
       <input id="password" type="password" autocomplete="current-password" required>
-      <button type="submit">Unlock</button>
+      <button type="submit">Open CMS</button>
     </form>
-    <p class="hint">Set this with the Vercel environment variable <code>CMS_PASSWORD</code>.</p>
   </section>
 
   <section class="app" id="cmsApp" hidden>
     <header class="top">
       <div>
         <p class="kicker">Nsquare CMS</p>
-        <h1>Content Manager</h1>
+        <h1>Website Content</h1>
+        <p>Manage projects, blogs, and important website images from one place.</p>
       </div>
       <div class="actions">
-        <button id="refreshBtn" type="button">Refresh</button>
-        <button id="saveBtn" type="button">Save All</button>
-        <button id="logoutBtn" type="button">Lock</button>
+        <button id="saveBtn" type="button">Save Changes</button>
+        <button id="refreshBtn" class="light" type="button">Reload</button>
+        <button id="logoutBtn" class="light" type="button">Lock</button>
       </div>
     </header>
 
     <div class="status" id="status">Ready.</div>
 
-    <section class="panel">
-      <div>
-        <p class="kicker">Images</p>
-        <h2>Upload Asset</h2>
-        <p>Upload hero, gallery, project, blog or section images. Copy the returned URL into any image field below.</p>
-      </div>
-      <div class="upload">
-        <input id="imageFile" type="file" accept="image/*">
-        <button id="uploadBtn" type="button">Upload Image</button>
-        <input id="uploadedUrl" readonly placeholder="Uploaded image URL appears here">
-      </div>
+    <nav class="tabs" aria-label="CMS sections">
+      <button class="active" type="button" data-tab="projects">Projects</button>
+      <button type="button" data-tab="blogs">Blogs</button>
+      <button type="button" data-tab="images">Site Images</button>
+      <button type="button" data-tab="raw">Advanced</button>
+    </nav>
+
+    <section class="tab-panel active" id="tab-projects">
+      <aside class="sidebar">
+        <div class="side-head"><div><p class="kicker">Projects</p><h2>Project list</h2></div><button id="addProjectBtn" type="button">Add</button></div>
+        <div class="list" id="projectList"></div>
+      </aside>
+      <form class="form" id="projectForm">
+        <div class="guide"><b>Where this appears:</b> home project cards, projects page, project detail page, and project filters.</div>
+        <div class="thumb-row"><img id="projectThumb" alt=""><div><p class="kicker">Project Preview</p><h2 id="projectPreviewTitle">Select a project</h2><p id="projectPreviewText">Use the fields below to update the selected project.</p></div></div>
+        <div class="fields two">
+          <label>Project name<input data-project="name" placeholder="Ravine Villa"></label>
+          <label>Slug<input data-project="slug" placeholder="ravine-villa"></label>
+          <label>Status<select data-project="status"><option value="ongoing">Ongoing</option><option value="completed">Completed</option></select></label>
+          <label>Type / filters<input data-project="type" placeholder="villa residential"></label>
+          <label>Location<input data-project="location" placeholder="Indiranagar, Bengaluru"></label>
+          <label>Area<input data-project="area" placeholder="20,000 sq ft"></label>
+          <label>Client / owner<input data-project="client" placeholder="Client name"></label>
+        </div>
+        <label>Short card summary<textarea data-project="summary" rows="3"></textarea></label>
+        <label>Project detail text<textarea data-project="details" rows="5"></textarea></label>
+        <div class="image-field"><label>Main image URL<input data-project="image" data-image-input></label><button type="button" data-upload-for="project.image">Upload</button></div>
+        <div class="image-field"><label>Second image URL<input data-project="secondaryImage" data-image-input></label><button type="button" data-upload-for="project.secondaryImage">Upload</button></div>
+        <div class="repeat-head"><div><p class="kicker">Scope</p><h3>What services were included?</h3></div><button type="button" data-add-repeat="projectScope">Add item</button></div>
+        <div class="repeat" id="projectScope"></div>
+        <button class="danger" id="deleteProjectBtn" type="button">Delete Project</button>
+      </form>
     </section>
 
-    <section class="grid">
-      <article class="editor">
-        <div class="editor-head">
-          <div>
-            <p class="kicker">Projects</p>
-            <h2>Project Data</h2>
-          </div>
-          <button data-format="projectsEditor" type="button">Format</button>
+    <section class="tab-panel" id="tab-blogs">
+      <aside class="sidebar">
+        <div class="side-head"><div><p class="kicker">Blogs</p><h2>Article list</h2></div><button id="addArticleBtn" type="button">Add</button></div>
+        <div class="list" id="articleList"></div>
+      </aside>
+      <form class="form" id="articleForm">
+        <div class="guide"><b>Where this appears:</b> journal page cards and blog detail pages.</div>
+        <div class="thumb-row"><img id="articleThumb" alt=""><div><p class="kicker">Blog Preview</p><h2 id="articlePreviewTitle">Select an article</h2><p id="articlePreviewText">Write and arrange the article below.</p></div></div>
+        <div class="fields two">
+          <label>Title<input data-article="title"></label>
+          <label>Slug<input data-article="slug"></label>
+          <label>Display category<input data-article="category" placeholder="Design · Elevations"></label>
+          <label>Filter keywords<input data-article="categories" placeholder="insights practice"></label>
+          <label>Image alt text<input data-article="alt"></label>
         </div>
-        <textarea id="projectsEditor" spellcheck="false"></textarea>
-      </article>
-
-      <article class="editor">
-        <div class="editor-head">
-          <div>
-            <p class="kicker">Blogs</p>
-            <h2>Journal Data</h2>
-          </div>
-          <button data-format="articlesEditor" type="button">Format</button>
-        </div>
-        <textarea id="articlesEditor" spellcheck="false"></textarea>
-      </article>
+        <label>Short summary<textarea data-article="summary" rows="3"></textarea></label>
+        <div class="image-field"><label>Main blog image URL<input data-article="image" data-image-input></label><button type="button" data-upload-for="article.image">Upload</button></div>
+        <div class="image-field"><label>Supporting image URL<input data-article="secondaryImage" data-image-input></label><button type="button" data-upload-for="article.secondaryImage">Upload</button></div>
+        <div class="repeat-head"><div><p class="kicker">Key points</p><h3>Short takeaways</h3></div><button type="button" data-add-repeat="articleTakeaways">Add takeaway</button></div>
+        <div class="repeat" id="articleTakeaways"></div>
+        <div class="repeat-head"><div><p class="kicker">Article body</p><h3>Paragraphs</h3></div><button type="button" data-add-repeat="articleBody">Add paragraph</button></div>
+        <div class="repeat" id="articleBody"></div>
+        <button class="danger" id="deleteArticleBtn" type="button">Delete Blog</button>
+      </form>
     </section>
 
-    <section class="editor full">
-      <div class="editor-head">
-        <div>
-          <p class="kicker">Sections</p>
-          <h2>Site Images & Settings</h2>
-        </div>
-        <button data-format="siteEditor" type="button">Format</button>
-      </div>
-      <textarea id="siteEditor" spellcheck="false"></textarea>
-    </section>
+    <section class="tab-panel" id="tab-images"><div class="form wide"><div class="guide"><b>Site images:</b> these control major images across hero sections and process sections.</div><div class="site-images" id="siteImages"></div></div></section>
+    <section class="tab-panel" id="tab-raw"><div class="form wide"><div class="guide"><b>Advanced:</b> only use this if we need to copy/export data for debugging.</div><textarea id="rawEditor" spellcheck="false"></textarea></div></section>
   </section>
 </main>
+<input id="hiddenUploader" type="file" accept="image/*" hidden>
 <script src="admin.js"></script>
 </body>
 </html>
