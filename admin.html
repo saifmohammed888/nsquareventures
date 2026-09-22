@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nsquare CMS</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<main class="shell">
+  <section class="login" id="loginPanel">
+    <p class="kicker">Nsquare CMS</p>
+    <h1>Content Manager</h1>
+    <p>Manage projects, blogs, site images and uploaded assets.</p>
+    <form id="loginForm">
+      <label>Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Unlock</button>
+    </form>
+    <p class="hint">Set this with the Vercel environment variable <code>CMS_PASSWORD</code>.</p>
+  </section>
+
+  <section class="app" id="cmsApp" hidden>
+    <header class="top">
+      <div>
+        <p class="kicker">Nsquare CMS</p>
+        <h1>Content Manager</h1>
+      </div>
+      <div class="actions">
+        <button id="refreshBtn" type="button">Refresh</button>
+        <button id="saveBtn" type="button">Save All</button>
+        <button id="logoutBtn" type="button">Lock</button>
+      </div>
+    </header>
+
+    <div class="status" id="status">Ready.</div>
+
+    <section class="panel">
+      <div>
+        <p class="kicker">Images</p>
+        <h2>Upload Asset</h2>
+        <p>Upload hero, gallery, project, blog or section images. Copy the returned URL into any image field below.</p>
+      </div>
+      <div class="upload">
+        <input id="imageFile" type="file" accept="image/*">
+        <button id="uploadBtn" type="button">Upload Image</button>
+        <input id="uploadedUrl" readonly placeholder="Uploaded image URL appears here">
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="editor">
+        <div class="editor-head">
+          <div>
+            <p class="kicker">Projects</p>
+            <h2>Project Data</h2>
+          </div>
+          <button data-format="projectsEditor" type="button">Format</button>
+        </div>
+        <textarea id="projectsEditor" spellcheck="false"></textarea>
+      </article>
+
+      <article class="editor">
+        <div class="editor-head">
+          <div>
+            <p class="kicker">Blogs</p>
+            <h2>Journal Data</h2>
+          </div>
+          <button data-format="articlesEditor" type="button">Format</button>
+        </div>
+        <textarea id="articlesEditor" spellcheck="false"></textarea>
+      </article>
+    </section>
+
+    <section class="editor full">
+      <div class="editor-head">
+        <div>
+          <p class="kicker">Sections</p>
+          <h2>Site Images & Settings</h2>
+        </div>
+        <button data-format="siteEditor" type="button">Format</button>
+      </div>
+      <textarea id="siteEditor" spellcheck="false"></textarea>
+    </section>
+  </section>
+</main>
+<script src="admin.js"></script>
+</body>
+</html>

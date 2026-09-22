@@ -2,6 +2,7 @@ window.NSQUARE_ARTICLES = [
   {
     slug: "elevations-neighbourhoods",
     category: "Design · Elevations",
+    categories: "insights practice",
     title: "The role of elevations in shaping better neighbourhoods.",
     image: "Images/Elevation/Farooq Apartment HBR.png",
     secondaryImage: "Images/Elevation/Anwar HBR - 1.png",
@@ -21,6 +22,7 @@ window.NSQUARE_ARTICLES = [
   {
     slug: "sketch-to-approval",
     category: "Process · Approvals",
+    categories: "process approvals",
     title: "From sketch to approval.",
     image: "Images/wireframe.jpg",
     secondaryImage: "Images/Elevation/Trillium School Arial.png",
@@ -40,6 +42,7 @@ window.NSQUARE_ARTICLES = [
   {
     slug: "materials-long-term-value",
     category: "Materials · Longevity",
+    categories: "materials insights",
     title: "Choosing materials for long-term value.",
     image: "Images/Elevation/Karamath Bellari.png",
     secondaryImage: "Images/Elevation/Ravi Villa.png",
@@ -59,6 +62,7 @@ window.NSQUARE_ARTICLES = [
   {
     slug: "city-in-transition",
     category: "Bengaluru · Context",
+    categories: "bengaluru practice",
     title: "A city in transition.",
     image: "Images/Elevation/jaleel Complex RT Nagar.png",
     secondaryImage: "Images/Elevation/Samhitha Towr.png",
