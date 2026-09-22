@@ -224,9 +224,10 @@ nsBindProjectFilters();
       ['processImage', '.process-visual > img']
     ];
     imageMap.forEach(([key, selector]) => {
-      if(site[key]){
-        document.querySelectorAll(selector).forEach(img => { img.src = site[key]; });
-      }
+      document.querySelectorAll(selector).forEach(img => {
+        const nextSrc = site[key] || img.dataset.fallbackSrc;
+        if(nextSrc && img.src !== nextSrc) img.src = nextSrc;
+      });
     });
 
     const projectGrid = document.querySelector('.archive .grid');

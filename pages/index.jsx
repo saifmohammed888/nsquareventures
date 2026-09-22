@@ -140,7 +140,7 @@ export default function Page(){
    <div class="hero-note">Architecture-led. Execution-aware.<br>From first sketch to site execution.</div>
  </div>
  <div class="visual">
-	   <img src="Images/Praveen Villa - Indiranagar.png" alt="Ravine Villa residential architecture">
+	   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-fallback-src="Images/Praveen Villa - Indiranagar.png" alt="Ravine Villa residential architecture">
    <div class="drawing"><svg viewBox="0 0 900 650" preserveAspectRatio="none"><path d="M0 510 L210 325 L365 405 L555 180 L900 260 M45 585 L45 90 M240 620 L240 40 M470 620 L470 80 M680 620 L680 20 M0 500 H900 M0 390 H900 M0 280 H900 M0 170 H900"/></svg></div>
    <div class="visual-meta">Spaces<br>people<br>belong in</div>
    <div class="location">Bengaluru · Karnataka</div>
@@ -171,7 +171,7 @@ export default function Page(){
 	  <div class="process-step"><strong>04</strong><b>Execute</b><span>Construction, detailing, procurement and site decisions.</span></div>
 	  <div class="process-step"><strong>05</strong><b>Deliver</b><span>Finishing, interiors, handover and post-completion support.</span></div>
 	 </div>
-	 <div class="process-visual"><div class="drawing-panel"></div><img src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
+	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
 	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
 	</section>
 	<!-- <section class="journal" id="journal">
