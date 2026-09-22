@@ -107,8 +107,6 @@
   if(!form) return;
 
   const architectWhatsAppNumber = form.dataset.whatsappNumber || '';
-  const status = document.getElementById('contactStatus');
-  const preview = document.getElementById('messagePreview');
   const projectFromUrl = new URLSearchParams(window.location.search).get('project');
   if(projectFromUrl && form.elements.message){
     form.elements.message.value = `I would like to discuss ${projectFromUrl}. `;
@@ -128,19 +126,46 @@
       `Message: ${data.get('message') || ''}`
     ].join('\n');
 
-    if(preview){
-      preview.hidden = false;
-      preview.textContent = message;
-    }
-
-    if(!architectWhatsAppNumber){
-      if(status){
-        status.textContent = 'Message prepared. Add the architect WhatsApp number in the form data-whatsapp-number attribute to open a direct chat.';
-      }
-      return;
-    }
-
-    window.open(`https://wa.me/${architectWhatsAppNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-    if(status) status.textContent = 'Opening WhatsApp with your enquiry message.';
+    const encodedMessage = encodeURIComponent(message);
+    const whatsAppUrl = architectWhatsAppNumber
+      ? `https://wa.me/${architectWhatsAppNumber}?text=${encodedMessage}`
+      : `https://api.whatsapp.com/send?text=${encodedMessage}`;
+    window.location.href = whatsAppUrl;
   });
+})();
+
+(function(){
+  const mount = document.getElementById('journalDetail');
+  const articles = window.NSQUARE_ARTICLES || [];
+  if(!mount || !articles.length) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('article') || articles[0].slug;
+  const article = articles.find(item => item.slug === slug);
+
+  if(!article){
+    mount.innerHTML = '<section class="article-empty"><div class="eyebrow">Journal</div><h1>Article not found.</h1><p><a href="journal.html">Return to journal →</a></p></section>';
+    return;
+  }
+
+  document.title = `${article.title} — Nsquare Journal`;
+  mount.innerHTML = `
+    <section class="article-hero">
+      <div class="article-copy">
+        <div class="eyebrow">${article.category}</div>
+        <h1>${article.title}</h1>
+        <p>${article.summary}</p>
+      </div>
+      <div class="article-image"><img src="${article.image}" alt="${article.alt}"></div>
+    </section>
+    <section class="article-body">
+      <aside>
+        <div class="eyebrow">Nsquare Journal</div>
+        <a href="journal.html">Back to Journal <span>→</span></a>
+      </aside>
+      <article>
+        ${article.body.map(paragraph => `<p>${paragraph}</p>`).join('')}
+      </article>
+    </section>
+  `;
 })();

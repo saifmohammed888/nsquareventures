@@ -233,22 +233,6 @@ section.hero{
   color:var(--site-ink)!important;
   font-weight:600!important;
 }
-.form-status{
-  grid-column:1 / -1;
-  margin:0;
-  color:var(--site-text);
-  line-height:1.6;
-}
-.message-preview{
-  grid-column:1 / -1;
-  white-space:pre-wrap;
-  margin:0;
-  padding:18px;
-  border:1px solid var(--site-line);
-  background:rgba(255,255,255,.42);
-  color:var(--site-ink);
-  font:13px/1.6 var(--site-sans);
-}
 .card-image img,
 .media img,
 .post img,
