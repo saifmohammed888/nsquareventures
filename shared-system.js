@@ -149,6 +149,10 @@
   }
 
   document.title = `${article.title} — Nsquare Journal`;
+  const takeaways = (article.takeaways || []).map(item => `<li>${item}</li>`).join('');
+  const secondaryImage = article.secondaryImage
+    ? `<figure class="article-wide-image"><img src="${article.secondaryImage}" alt="${article.title} supporting view"></figure>`
+    : '';
   mount.innerHTML = `
     <section class="article-hero">
       <div class="article-copy">
@@ -164,7 +168,11 @@
         <a href="journal.html">Back to Journal <span>→</span></a>
       </aside>
       <article>
-        ${article.body.map(paragraph => `<p>${paragraph}</p>`).join('')}
+        ${article.body.slice(0, 3).map(paragraph => `<p>${paragraph}</p>`).join('')}
+        ${takeaways ? `<h2>Key considerations</h2><ul>${takeaways}</ul>` : ''}
+        ${secondaryImage}
+        <h2>Practice notes</h2>
+        ${article.body.slice(3).map(paragraph => `<p>${paragraph}</p>`).join('')}
       </article>
     </section>
   `;
