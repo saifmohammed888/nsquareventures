@@ -1,0 +1,52 @@
+:root{--bg:#fff;--fg:#050505;--muted:#666;--line:#ddd;--soft:#f6f6f6;--danger:#a40000}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+button{border:1px solid var(--fg);background:var(--fg);color:#fff;padding:10px 14px;cursor:pointer}
+button:hover{background:#333}
+button.light,.tabs button{background:#fff;color:var(--fg)}
+button.danger{border-color:var(--danger);color:var(--danger);background:#fff;margin-top:12px}
+input,textarea,select{width:100%;border:1px solid var(--line);background:#fff;color:var(--fg);padding:11px}
+textarea{resize:vertical;min-height:92px}
+label{display:grid;gap:7px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.shell{max-width:1500px;margin:0 auto;padding:28px}
+.login{max-width:460px;margin:10vh auto;border:1px solid var(--line);padding:34px}
+.login h1,.top h1,.sidebar h2,.form h2{margin:0;line-height:1}
+.login p,.top p,.guide,.status{color:var(--muted)}
+.login form{display:grid;gap:12px;margin-top:26px}
+.kicker{margin:0 0 8px;color:var(--muted);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.top{display:flex;justify-content:space-between;align-items:end;gap:24px;border-bottom:1px solid var(--line);padding-bottom:22px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.status{border:1px solid var(--line);background:var(--soft);padding:12px 14px;margin:18px 0}
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow:auto}
+.tabs button{border-bottom:0}
+.tabs button.active{background:var(--fg);color:#fff}
+.tab-panel{display:none;grid-template-columns:330px minmax(0,1fr);gap:22px}
+.tab-panel.active{display:grid}
+.sidebar,.form{border:1px solid var(--line);background:#fff;padding:18px}
+.sidebar{height:max-content;position:sticky;top:16px}
+.side-head,.repeat-head,.editor-head{display:flex;justify-content:space-between;gap:14px;align-items:start;margin-bottom:14px}
+.list{display:grid;gap:8px;max-height:72vh;overflow:auto;padding-right:4px}
+.item{display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:center;border:1px solid var(--line);background:#fff;padding:8px;text-align:left;color:var(--fg)}
+.item.active{outline:2px solid var(--fg)}
+.item img{width:62px;height:48px;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
+.item b{display:block;font-size:13px;line-height:1.2}
+.item span{display:block;color:var(--muted);font-size:11px;margin-top:4px;text-transform:capitalize}
+.guide{background:var(--soft);border:1px solid var(--line);padding:13px 14px;margin-bottom:16px}
+.thumb-row{display:grid;grid-template-columns:220px 1fr;gap:18px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}
+.thumb-row img{width:220px;height:150px;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
+.thumb-row h2,.thumb-row p{margin:0 0 8px}
+.fields{display:grid;gap:14px;margin-bottom:14px}
+.fields.two{grid-template-columns:1fr 1fr}
+.image-field{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin:14px 0}
+.repeat{display:grid;gap:10px;margin-bottom:18px}
+.repeat-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.repeat-row textarea{min-height:84px}
+.repeat-row button{background:#fff;color:var(--danger);border-color:var(--danger)}
+.site-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.site-card{border:1px solid var(--line);padding:14px}
+.site-card img{width:100%;height:180px;object-fit:cover;background:var(--soft);border:1px solid var(--line);margin:10px 0}
+.site-card p{color:var(--muted);margin:5px 0 12px;font-size:12px}
+.wide{max-width:1100px}
+#rawEditor{min-height:620px;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media(max-width:900px){.shell{padding:16px}.top,.tab-panel,.thumb-row,.fields.two,.site-images{grid-template-columns:1fr}.top{align-items:start}.sidebar{position:static}.image-field{grid-template-columns:1fr}.thumb-row img{width:100%;height:220px}}
