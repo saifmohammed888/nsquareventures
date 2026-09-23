@@ -79,6 +79,10 @@ function nsPreloadContentImages(content){
   images.filter(Boolean).slice(0, 80).forEach((src, index) => nsPreloadImage(src, index < 10));
 }
 
+function nsProjectStatus(project){
+  return String(project?.status || '').toLowerCase() === 'completed' ? 'completed' : 'ongoing';
+}
+
 function nsEscape(value){
   return String(value == null ? '' : value)
     .replace(/&/g, '&amp;')
@@ -123,7 +127,7 @@ function nsBindProjectFilters(){
 
   function matches(project, filter){
     if(filter === 'all') return true;
-    const status = project.dataset.status || '';
+    const status = project.dataset.status || 'ongoing';
     const type = project.dataset.type || '';
     return status === filter || type.split(/\s+/).includes(filter);
   }
@@ -161,7 +165,7 @@ nsBindProjectFilters();
     mount.innerHTML = `
       <section class="detail-hero">
         <div class="detail-copy">
-          <div class="eyebrow">${nsEscape(project.status)} project</div>
+          <div class="eyebrow">${nsEscape(nsProjectStatus(project))} project</div>
           <h1>${nsEscape(project.name)}</h1>
           <p>${nsEscape(project.summary)}</p>
           <div class="detail-actions">
@@ -172,7 +176,7 @@ nsBindProjectFilters();
         <div class="detail-image cms-image-shell">${nsImage(project.image, project.name)}</div>
       </section>
       <section class="detail-meta">
-        <div><b>Status</b><span>${nsEscape(project.status)}</span></div>
+        <div><b>Status</b><span>${nsEscape(nsProjectStatus(project))}</span></div>
         <div><b>Location</b><span>${nsEscape(project.location)}</span></div>
         <div><b>Area</b><span>${nsEscape(project.area)}</span></div>
         <div><b>Client</b><span>${nsEscape(project.client)}</span></div>
@@ -309,9 +313,9 @@ nsBindProjectFilters();
     const projectGrid = document.querySelector('.archive .grid');
     if(projectGrid){
       projectGrid.innerHTML = projects.map((project, index) => `
-        <a class="project" href="project-detail.html?project=${encodeURIComponent(project.slug)}" data-status="${nsEscape(project.status)}" data-type="${nsEscape(project.type)}">
+        <a class="project" href="project-detail.html?project=${encodeURIComponent(project.slug)}" data-status="${nsEscape(nsProjectStatus(project))}" data-type="${nsEscape(project.type)}">
           <div class="media cms-image-shell">${nsImage(project.image, project.name)}<span class="num">${String(index + 1).padStart(2, '0')}</span></div>
-          <div class="info"><div><h3>${nsEscape(project.name)}</h3><div class="meta">${nsEscape(project.location)}</div><div class="area">${nsEscape(project.area)} · ${nsEscape(project.status)}</div></div><span class="arrow">→</span></div>
+          <div class="info"><div><h3>${nsEscape(project.name)}</h3><div class="meta">${nsEscape(project.location)}</div><div class="area">${nsEscape(project.area)} · ${nsEscape(nsProjectStatus(project))}</div></div><span class="arrow">→</span></div>
         </a>
       `).join('');
       nsInitImageLoading(projectGrid);
@@ -320,8 +324,8 @@ nsBindProjectFilters();
 
     const homeGrid = document.querySelector('.project-grid');
     if(homeGrid){
-      const ongoing = projects.filter(project => project.status === 'ongoing').slice(0, 5);
-      const completed = projects.filter(project => project.status === 'completed').slice(0, 5);
+      const ongoing = projects.filter(project => nsProjectStatus(project) === 'ongoing').slice(0, 5);
+      const completed = projects.filter(project => nsProjectStatus(project) === 'completed').slice(0, 5);
       const card = project => `
         <a class="card" href="project-detail.html?project=${encodeURIComponent(project.slug)}">
           <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}${nsImage(project.secondaryImage || project.image, `${project.name} supporting image`)}</div>
