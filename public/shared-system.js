@@ -62,6 +62,11 @@ function nsEscape(value){
     .replace(/"/g, '&quot;');
 }
 
+function nsImage(src, alt, className){
+  const classes = ['cms-lazy-image', className].filter(Boolean).join(' ');
+  return `<img class="${classes}" src="${nsEscape(src)}" alt="${nsEscape(alt)}" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')" onerror="this.classList.add('is-loaded','is-broken')">`;
+}
+
 function nsBindProjectFilters(){
   const buttons = [...document.querySelectorAll('.filters button[data-filter]')];
   const projects = [...document.querySelectorAll('.project[data-status][data-type]')];
@@ -234,7 +239,7 @@ nsBindProjectFilters();
     if(projectGrid){
       projectGrid.innerHTML = projects.map((project, index) => `
         <a class="project" href="project-detail.html?project=${encodeURIComponent(project.slug)}" data-status="${nsEscape(project.status)}" data-type="${nsEscape(project.type)}">
-          <div class="media"><img src="${nsEscape(project.image)}" alt="${nsEscape(project.name)}"><span class="num">${String(index + 1).padStart(2, '0')}</span></div>
+          <div class="media cms-image-shell">${nsImage(project.image, project.name)}<span class="num">${String(index + 1).padStart(2, '0')}</span></div>
           <div class="info"><div><h3>${nsEscape(project.name)}</h3><div class="meta">${nsEscape(project.location)}</div><div class="area">${nsEscape(project.area)} · ${nsEscape(project.status)}</div></div><span class="arrow">→</span></div>
         </a>
       `).join('');
@@ -247,7 +252,7 @@ nsBindProjectFilters();
       const completed = projects.filter(project => project.status === 'completed');
       const card = project => `
         <a class="card" href="project-detail.html?project=${encodeURIComponent(project.slug)}">
-          <div class="card-image"><img src="${nsEscape(project.image)}" alt="${nsEscape(project.name)}"><img src="${nsEscape(project.secondaryImage || project.image)}" alt="${nsEscape(project.name)} supporting image"></div>
+          <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}${nsImage(project.secondaryImage || project.image, `${project.name} supporting image`)}</div>
           <div class="card-info"><h3>${nsEscape(project.name)}</h3><p>${nsEscape(project.summary)}</p><div class="project-meta"><span><b>Client</b>${nsEscape(project.client)}</span><span><b>Location</b>${nsEscape(project.location)}</span><span><b>Area</b>${nsEscape(project.area)}</span></div><span class="arrow">→</span></div>
         </a>
       `;
@@ -258,7 +263,7 @@ nsBindProjectFilters();
     if(journalPosts){
       journalPosts.innerHTML = articles.map(article => `
         <a class="post" href="journal-detail.html?article=${encodeURIComponent(article.slug)}" data-categories="${nsEscape(article.categories || article.category || '')}">
-          <img src="${nsEscape(article.image)}" alt="${nsEscape(article.alt || article.title)}">
+          <span class="post-image cms-image-shell">${nsImage(article.image, article.alt || article.title)}</span>
           <div class="post-meta">${nsEscape(article.category)}</div>
           <h3>${nsEscape(article.title)}</h3>
           <p>${nsEscape(article.summary)}</p>
