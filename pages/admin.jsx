@@ -45,7 +45,7 @@ export default function Admin(){
   const [password, setPassword] = useState('');
   const [authed, setAuthed] = useState(false);
   const [status, setStatus] = useState('Locked.');
-  const [tab, setTab] = useState('projects');
+  const [tab, setTab] = useState('images');
   const [content, setContent] = useState({ projects: [], articles: [], media: [], site: {} });
   const [projectIndex, setProjectIndex] = useState(0);
   const [articleIndex, setArticleIndex] = useState(0);
