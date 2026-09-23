@@ -79,6 +79,24 @@ function nsPreloadContentImages(content){
   images.filter(Boolean).slice(0, 80).forEach((src, index) => nsPreloadImage(src, index < 10));
 }
 
+function nsLoadImage(src){
+  if(!src) return Promise.resolve();
+  return new Promise(resolve => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = resolve;
+    image.onerror = resolve;
+    image.src = src;
+    if(image.decode){
+      image.decode().then(resolve).catch(resolve);
+    }
+  });
+}
+
+function nsWaitForImages(sources){
+  return Promise.all([...new Set((sources || []).filter(Boolean))].map(nsLoadImage));
+}
+
 function nsProjectStatus(project){
   return String(project?.status || '').toLowerCase() === 'completed' ? 'completed' : 'ongoing';
 }
@@ -149,7 +167,7 @@ nsBindProjectFilters();
   const mount = document.getElementById('projectDetail');
   if(!mount) return;
 
-  NSQUARE_CONTENT_READY.then(({ projects }) => {
+  NSQUARE_CONTENT_READY.then(async ({ projects }) => {
     if(!projects.length) return;
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('project') || projects[0].slug;
@@ -161,6 +179,7 @@ nsBindProjectFilters();
     }
 
     document.title = `${project.name} — Nsquare Ventures`;
+    await nsWaitForImages([project.image, project.secondaryImage || project.image]);
     const scope = (project.scope || []).map(item => `<span>${nsEscape(item)}</span>`).join('');
     mount.innerHTML = `
       <section class="detail-hero">
@@ -230,7 +249,7 @@ nsBindProjectFilters();
   const mount = document.getElementById('journalDetail');
   if(!mount) return;
 
-  NSQUARE_CONTENT_READY.then(({ articles }) => {
+  NSQUARE_CONTENT_READY.then(async ({ articles }) => {
     if(!articles.length) return;
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('article') || articles[0].slug;
@@ -242,6 +261,7 @@ nsBindProjectFilters();
     }
 
     document.title = `${article.title} — Nsquare Journal`;
+    await nsWaitForImages([article.image, article.secondaryImage]);
     const body = Array.isArray(article.body) ? article.body : String(article.body || '').split('\n').filter(Boolean);
     const takeaways = (article.takeaways || []).map((item, index) => `<li><span>${String(index + 1).padStart(2, '0')}</span><p>${nsEscape(item)}</p></li>`).join('');
     const secondaryImage = article.secondaryImage
@@ -281,7 +301,7 @@ nsBindProjectFilters();
 })();
 
 (function(){
-  NSQUARE_CONTENT_READY.then(({ projects, articles, site }) => {
+  NSQUARE_CONTENT_READY.then(async ({ projects, articles, site }) => {
     nsPreloadContentImages({ projects, articles, site });
     const siteAliases = {
       homeProcessImage: ['processImage']
@@ -290,9 +310,13 @@ nsBindProjectFilters();
       return site[key] || (siteAliases[key] || []).map(alias => site[alias]).find(Boolean);
     }
 
-    document.querySelectorAll('img[data-cms-image]').forEach(img => {
-      const nextSrc = siteImageValue(img.dataset.cmsImage) || img.dataset.fallbackSrc;
-      if(nextSrc && img.src !== nextSrc) img.src = nextSrc;
+    const cmsImageAssignments = [...document.querySelectorAll('img[data-cms-image]')].map(img => ({
+      img,
+      src: siteImageValue(img.dataset.cmsImage) || img.dataset.fallbackSrc
+    }));
+    await nsWaitForImages(cmsImageAssignments.map(item => item.src));
+    cmsImageAssignments.forEach(({ img, src }) => {
+      if(src && img.src !== src) img.src = src;
       nsPrepareImage(img);
     });
 
@@ -312,6 +336,7 @@ nsBindProjectFilters();
 
     const projectGrid = document.querySelector('.archive .grid');
     if(projectGrid){
+      await nsWaitForImages(projects.map(project => project.image));
       projectGrid.innerHTML = projects.map((project, index) => `
         <a class="project" href="project-detail.html?project=${encodeURIComponent(project.slug)}" data-status="${nsEscape(nsProjectStatus(project))}" data-type="${nsEscape(project.type)}">
           <div class="media cms-image-shell">${nsImage(project.image, project.name)}<span class="num">${String(index + 1).padStart(2, '0')}</span></div>
@@ -326,6 +351,7 @@ nsBindProjectFilters();
     if(homeGrid){
       const ongoing = projects.filter(project => nsProjectStatus(project) === 'ongoing').slice(0, 5);
       const completed = projects.filter(project => nsProjectStatus(project) === 'completed').slice(0, 5);
+      await nsWaitForImages([...ongoing, ...completed].flatMap(project => [project.image, project.secondaryImage || project.image]));
       const card = project => `
         <a class="card" href="project-detail.html?project=${encodeURIComponent(project.slug)}">
           <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}${nsImage(project.secondaryImage || project.image, `${project.name} supporting image`)}</div>
@@ -338,6 +364,7 @@ nsBindProjectFilters();
 
     const journalPosts = document.querySelector('#journal-posts .posts');
     if(journalPosts){
+      await nsWaitForImages(articles.map(article => article.image));
       journalPosts.innerHTML = articles.map(article => `
         <a class="post" href="journal-detail.html?article=${encodeURIComponent(article.slug)}" data-categories="${nsEscape(article.categories || article.category || '')}">
           <span class="post-image cms-image-shell">${nsImage(article.image, article.alt || article.title)}</span>
