@@ -77,17 +77,25 @@ export default function Admin(){
 
   function authHeaders(extra = {}){ return { ...extra, 'x-cms-password': password }; }
   function sync(next){ setRaw(JSON.stringify(next, null, 2)); return next; }
+  function mergeUploadedImages(next, images = imageOptions){
+    const media = next.media || [];
+    const urls = new Set(media.map(item => item.url));
+    const uploaded = (images || [])
+      .filter(item => item.source === 'Uploaded' && item.url && !urls.has(item.url))
+      .map(item => ({ id: item.url, name: item.label || 'Uploaded image', description: 'Uploaded Blob image', url: item.url, createdAt: new Date().toISOString() }));
+    return uploaded.length ? { ...next, media: [...media, ...uploaded] } : next;
+  }
 
   async function loadContent(){
     setStatus('Loading content...');
     const response = await fetch('/api/content', { headers: authHeaders() });
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || 'Unable to load content.');
-    const next = sync({ projects: data.projects || [], articles: data.articles || [], media: data.media || [], site: data.site || {} });
+    const images = await loadImages();
+    const next = sync(mergeUploadedImages({ projects: data.projects || [], articles: data.articles || [], media: data.media || [], site: data.site || {} }, images));
     setContent(next);
     setProjectIndex(0);
     setArticleIndex(0);
-    await loadImages();
     setStatus(`Loaded ${next.projects.length} projects and ${next.articles.length} blogs.`);
   }
 
@@ -109,7 +117,7 @@ export default function Admin(){
     setSaving(true);
     setStatus('Saving...');
     try{
-      const body = tab === 'raw' ? JSON.parse(raw || '{}') : content;
+      const body = mergeUploadedImages(tab === 'raw' ? JSON.parse(raw || '{}') : content);
       const saved = await writeContent(body);
       setContent(saved);
       setStatus('Saved. Refresh the public site to see updates.');
@@ -181,11 +189,8 @@ export default function Admin(){
       const data = await response.json();
       if(!response.ok) throw new Error(data.error || 'Upload failed.');
       const mediaItem = { id: `${Date.now()}`, name, description: mediaDraft.description.trim(), url: data.url, createdAt: new Date().toISOString() };
-      let nextContent;
-      setContent(current => {
-        nextContent = sync({ ...current, media: [mediaItem, ...(current.media || [])] });
-        return nextContent;
-      });
+      const nextContent = sync(mergeUploadedImages({ ...content, media: [mediaItem, ...(content.media || [])] }));
+      setContent(nextContent);
       const saved = await writeContent(nextContent);
       setContent(saved);
       setMediaDraft({ name: '', description: '', file: null });
@@ -257,7 +262,10 @@ function BlogsTab({ content, setContent, article, articleIndex, setArticleIndex,
 
 function ImagesTab({ content, setContent, uploading, mediaDraft, setMediaDraft, uploadMedia, sync, mediaSearch, setMediaSearch }){
   function removeMedia(id){ if(confirm('Remove this media record? Blob file stays stored, but it disappears from the named library.')) setContent(current => sync({ ...current, media: (current.media || []).filter(item => item.id !== id) })); }
-  const items = (content.media || []).filter(item => `${item.name || ''} ${item.description || ''}`.toLowerCase().includes(mediaSearch.toLowerCase()));
+  const savedMedia = content.media || [];
+  const savedUrls = new Set(savedMedia.map(item => item.url));
+  const blobMedia = imageOptions.filter(item => item.source === 'Uploaded' && !savedUrls.has(item.url)).map(item => ({ id: item.url, name: item.label || 'Uploaded image', description: 'Uploaded Blob image', url: item.url }));
+  const items = [...savedMedia, ...blobMedia].filter(item => `${item.name || ''} ${item.description || ''}`.toLowerCase().includes(mediaSearch.toLowerCase()));
   return <section className="grid gap-5"><Editor title="Upload Images"><form onSubmit={uploadMedia} onDrop={event => { event.preventDefault(); const file = event.dataTransfer.files?.[0]; if(file) setMediaDraft(current => ({ ...current, file, name: current.name || file.name.replace(/\.[^.]+$/, '') })); }} onDragOver={event => event.preventDefault()} className="grid gap-4 rounded-lg border border-dashed border-slate-300 bg-[#FAFBF8] p-6 lg:grid-cols-[1fr_1fr_auto] lg:items-end"><Field label="Image name"><TextInput value={mediaDraft.name} onChange={event => setMediaDraft(current => ({ ...current, name: event.target.value }))} placeholder="Homepage hero, Nadeem portrait..." /></Field><Field label="Description"><TextInput value={mediaDraft.description} onChange={event => setMediaDraft(current => ({ ...current, description: event.target.value }))} placeholder="Where this image is useful" /></Field><label className="grid gap-2 text-xs font-semibold uppercase tracking-wide text-neutral-600"><span>File</span><input type="file" accept="image/*" onChange={event => setMediaDraft(current => ({ ...current, file: event.target.files?.[0] || null, name: current.name || event.target.files?.[0]?.name?.replace(/\.[^.]+$/, '') || '' }))} className="block h-11 text-sm file:mr-3 file:h-11 file:border-0 file:rounded-md file:bg-[#18372F] file:px-4 file:text-sm file:font-semibold file:text-white" /></label><div className="lg:col-span-3"><Button type="submit" disabled={uploading === 'media'} className="rounded-md cms-green">{uploading === 'media' ? 'Uploading...' : 'Upload to media library'}</Button><p className="mt-2 text-xs text-neutral-500">Drag and drop or choose a file. Upload once, reuse everywhere.</p></div></form></Editor><Editor title="Media Library"><div className="mb-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"><p className="text-sm text-slate-500">Reusable images for projects, blogs and site sections.</p><TextInput value={mediaSearch} onChange={event => setMediaSearch(event.target.value)} placeholder="Search images..." /></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">{items.map(item => <div key={item.id || item.url} className="rounded-lg border cms-border bg-white p-2"><img src={item.url} alt="" className="h-32 w-full rounded-md bg-neutral-100 object-cover" /><div className="mt-2 min-w-0"><b className="block truncate text-sm">{item.name || 'Untitled image'}</b><p className="line-clamp-2 text-xs text-neutral-500">{item.description || item.url}</p><Button tone="danger" className="mt-2 h-8 rounded-md px-3 text-xs" onClick={() => removeMedia(item.id)}>Remove</Button></div></div>)}{!items.length && <p className="col-span-full rounded-lg border border-dashed border-neutral-300 p-6 text-sm text-neutral-500">No media found.</p>}</div></Editor></section>;
 }
 

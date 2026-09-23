@@ -8,7 +8,7 @@ const {
 
 export default async function handler(req, res){
   if(req.method === 'GET'){
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=15, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', authorized(req) ? 'no-store' : 'public, max-age=0, s-maxage=15, stale-while-revalidate=300');
     try{
       const storedContent = await readStoredContent();
       return res.status(200).json(storedContent || defaultContent());
