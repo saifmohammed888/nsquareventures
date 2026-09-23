@@ -260,8 +260,8 @@ nsBindProjectFilters();
 
     const homeGrid = document.querySelector('.project-grid');
     if(homeGrid){
-      const ongoing = projects.filter(project => project.status === 'ongoing');
-      const completed = projects.filter(project => project.status === 'completed');
+      const ongoing = projects.filter(project => project.status === 'ongoing').slice(0, 5);
+      const completed = projects.filter(project => project.status === 'completed').slice(0, 5);
       const card = project => `
         <a class="card" href="project-detail.html?project=${encodeURIComponent(project.slug)}">
           <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}${nsImage(project.secondaryImage || project.image, `${project.name} supporting image`)}</div>
