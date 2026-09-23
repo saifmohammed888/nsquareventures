@@ -67,6 +67,28 @@ function nsImage(src, alt, className){
   return `<img class="${classes}" src="${nsEscape(src)}" alt="${nsEscape(alt)}" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')" onerror="this.classList.add('is-loaded','is-broken')">`;
 }
 
+function nsPrepareImage(img){
+  if(!img || img.dataset.nsImageReady) return;
+  img.dataset.nsImageReady = 'true';
+  img.classList.add('cms-lazy-image');
+  if(!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+  if(!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+  if(img.parentElement && !img.parentElement.classList.contains('cms-image-shell')){
+    img.parentElement.classList.add('cms-image-shell');
+  }
+  const finish = broken => {
+    img.classList.add('is-loaded');
+    if(broken) img.classList.add('is-broken');
+  };
+  if(img.complete && img.naturalWidth > 0) finish(false);
+  img.addEventListener('load', () => finish(false), { once: true });
+  img.addEventListener('error', () => finish(true), { once: true });
+}
+
+function nsInitImageLoading(root){
+  (root || document).querySelectorAll('img').forEach(nsPrepareImage);
+}
+
 function nsBindProjectFilters(){
   const buttons = [...document.querySelectorAll('.filters button[data-filter]')];
   const projects = [...document.querySelectorAll('.project[data-status][data-type]')];
@@ -120,7 +142,7 @@ nsBindProjectFilters();
             <a href="projects.html">Back to projects <span>→</span></a>
           </div>
         </div>
-        <div class="detail-image"><img src="${nsEscape(project.image)}" alt="${nsEscape(project.name)}"></div>
+        <div class="detail-image cms-image-shell">${nsImage(project.image, project.name)}</div>
       </section>
       <section class="detail-meta">
         <div><b>Status</b><span>${nsEscape(project.status)}</span></div>
@@ -133,10 +155,11 @@ nsBindProjectFilters();
         <div><p>${nsEscape(project.details)}</p><div class="scope-grid">${scope}</div></div>
       </section>
       <section class="detail-gallery">
-        <img src="${nsEscape(project.image)}" alt="${nsEscape(project.name)} main view">
-        <img src="${nsEscape(project.secondaryImage || project.image)}" alt="${nsEscape(project.name)} supporting view">
+        <span class="cms-image-shell">${nsImage(project.image, `${project.name} main view`)}</span>
+        <span class="cms-image-shell">${nsImage(project.secondaryImage || project.image, `${project.name} supporting view`)}</span>
       </section>
     `;
+    nsInitImageLoading(mount);
   });
 })();
 
@@ -191,7 +214,7 @@ nsBindProjectFilters();
     const body = Array.isArray(article.body) ? article.body : String(article.body || '').split('\n').filter(Boolean);
     const takeaways = (article.takeaways || []).map(item => `<li>${nsEscape(item)}</li>`).join('');
     const secondaryImage = article.secondaryImage
-      ? `<figure class="article-wide-image"><img src="${nsEscape(article.secondaryImage)}" alt="${nsEscape(article.title)} supporting view"></figure>`
+      ? `<figure class="article-wide-image cms-image-shell">${nsImage(article.secondaryImage, `${article.title} supporting view`)}</figure>`
       : '';
     mount.innerHTML = `
       <section class="article-hero">
@@ -200,7 +223,7 @@ nsBindProjectFilters();
           <h1>${nsEscape(article.title)}</h1>
           <p>${nsEscape(article.summary)}</p>
         </div>
-        <div class="article-image"><img src="${nsEscape(article.image)}" alt="${nsEscape(article.alt || article.title)}"></div>
+        <div class="article-image cms-image-shell">${nsImage(article.image, article.alt || article.title)}</div>
       </section>
       <section class="article-body">
         <aside>
@@ -216,6 +239,7 @@ nsBindProjectFilters();
         </article>
       </section>
     `;
+    nsInitImageLoading(mount);
   });
 })();
 
@@ -231,6 +255,7 @@ nsBindProjectFilters();
     document.querySelectorAll('img[data-cms-image]').forEach(img => {
       const nextSrc = siteImageValue(img.dataset.cmsImage) || img.dataset.fallbackSrc;
       if(nextSrc && img.src !== nextSrc) img.src = nextSrc;
+      nsPrepareImage(img);
     });
 
     const cssImageMap = [
@@ -255,6 +280,7 @@ nsBindProjectFilters();
           <div class="info"><div><h3>${nsEscape(project.name)}</h3><div class="meta">${nsEscape(project.location)}</div><div class="area">${nsEscape(project.area)} · ${nsEscape(project.status)}</div></div><span class="arrow">→</span></div>
         </a>
       `).join('');
+      nsInitImageLoading(projectGrid);
       nsBindProjectFilters();
     }
 
@@ -269,6 +295,7 @@ nsBindProjectFilters();
         </a>
       `;
       homeGrid.innerHTML = `<div class="project-group">Ongoing Projects</div>${ongoing.map(card).join('')}<div class="project-group">Completed Projects</div>${completed.map(card).join('')}`;
+      nsInitImageLoading(homeGrid);
     }
 
     const journalPosts = document.querySelector('#journal-posts .posts');
@@ -281,6 +308,7 @@ nsBindProjectFilters();
           <p>${nsEscape(article.summary)}</p>
         </a>
       `).join('');
+      nsInitImageLoading(journalPosts);
       const categoryButtons = [...document.querySelectorAll('.categories button')];
       categoryButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -293,5 +321,6 @@ nsBindProjectFilters();
         });
       });
     }
+    nsInitImageLoading(document);
   });
 })();
