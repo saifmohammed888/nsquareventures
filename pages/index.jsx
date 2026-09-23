@@ -184,25 +184,10 @@ export default function Page(){
 	 <div class="project-grid" data-cms-projects></div>
 	 <!-- <div class="stats"><div class="stat"><strong>01</strong><span>Architecture-led</span></div><div class="stat"><strong>02</strong><span>Execution-aware</span></div><div class="stat"><strong>03</strong><span>Coordinated delivery</span></div><div class="signature">ARCHITECTURE · INTERIORS · CONSTRUCTION</div></div> -->
 	</section>
-	<section class="process" id="process">
-	 <div class="process-head">
-	  <div><div class="eyebrow">Process</div><h2>Concept to<br>completion.</h2></div>
-	  <p class="process-copy">A transparent, collaborative and execution-aware process from first conversation to final handover.</p>
-	 </div>
-	 <div class="process-steps">
-	  <div class="process-step"><strong>01</strong><b>Understand</b><span>Site, brief, requirements, feasibility and budget clarity.</span></div>
-	  <div class="process-step"><strong>02</strong><b>Design</b><span>Planning, architecture, interiors, elevations and materials.</span></div>
-	  <div class="process-step"><strong>03</strong><b>Coordinate</b><span>Approvals, structural inputs, MEP and consultants.</span></div>
-	  <div class="process-step"><strong>04</strong><b>Execute</b><span>Construction, detailing, procurement and site decisions.</span></div>
-	  <div class="process-step"><strong>05</strong><b>Deliver</b><span>Finishing, interiors, handover and post-completion support.</span></div>
-	 </div>
-	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeProcessImage" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
-	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
-	</section>
 	<section class="consultants" id="consultants">
 	 <div class="consultants-head">
 	  <div><div class="consultants-label">Our Consultants</div><h2>The people shaping each decision.</h2><div class="consultants-kicker">A trusted ecosystem of experts</div></div>
-	  <p class="consultants-copy">From design to delivery, we collaborate with leading professionals across disciplines to ensure every project is technically sound, compliant, and built to the highest standards.</p>
+	  <p class="consultants-copy">.</p>
 	  <div class="consultants-brand"><strong>N SQUARE VENTURES</strong><span>Architecture | Interiors | Construction</span></div>
 	 </div>
 	 <div class="consultants-body">
@@ -218,6 +203,21 @@ export default function Page(){
 	  </div>
 	 </div>
 	 <div class="consultants-bottom"><div class="consultants-foot">Stronger outcomes<br>through trusted collaborations.</div><a class="consultants-cta" href="/contact">Work with our ecosystem <span>→</span></a></div>
+	</section>
+	<section class="process" id="process">
+	 <div class="process-head">
+	  <div><div class="eyebrow">Process</div><h2>Concept to<br>completion.</h2></div>
+	  <p class="process-copy">A transparent, collaborative and execution-aware process from first conversation to final handover.</p>
+	 </div>
+	 <div class="process-steps">
+	  <div class="process-step"><strong>01</strong><b>Understand</b><span>Site, brief, requirements, feasibility and budget clarity.</span></div>
+	  <div class="process-step"><strong>02</strong><b>Design</b><span>Planning, architecture, interiors, elevations and materials.</span></div>
+	  <div class="process-step"><strong>03</strong><b>Coordinate</b><span>Approvals, structural inputs, MEP and consultants.</span></div>
+	  <div class="process-step"><strong>04</strong><b>Execute</b><span>Construction, detailing, procurement and site decisions.</span></div>
+	  <div class="process-step"><strong>05</strong><b>Deliver</b><span>Finishing, interiors, handover and post-completion support.</span></div>
+	 </div>
+	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeProcessImage" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
+	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
 	</section>
 	<!-- <section class="journal" id="journal">
 	 <div class="journal-head">
