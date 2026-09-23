@@ -150,7 +150,7 @@ export default function Page(){
 <div class="shell">
 <header class="header">
   <a class="brand" href="#"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a>
-  <nav class="nav" aria-label="Primary"><a class="active" href="/">Home</a><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/contact">Contact</a></nav>
+  <nav class="nav" aria-label="Primary"><a class="active" href="/">Home</a><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/gallery">Gallery</a><a href="/contact">Contact</a></nav>
   <!-- <div class="head-actions"><button class="menu-btn" id="menuOpen" aria-label="Open menu">Menu &nbsp; ↗</button></div> -->
   <div class="head-actions"><a class="inquire" href="/contact">Inquire <span>→</span></a><button class="menu-dot site-menu-trigger" type="button" aria-label="Open navigation">≡</button></div>
 </header>
@@ -169,7 +169,6 @@ export default function Page(){
    <div class="drawing"><svg viewBox="0 0 900 650" preserveAspectRatio="none"><path d="M0 510 L210 325 L365 405 L555 180 L900 260 M45 585 L45 90 M240 620 L240 40 M470 620 L470 80 M680 620 L680 20 M0 500 H900 M0 390 H900 M0 280 H900 M0 170 H900"/></svg></div>
    <div class="visual-meta">Spaces<br>people<br>belong in</div>
    <div class="location">Bengaluru · Karnataka</div>
-   <div class="pager"><span>←</span><strong>01</strong><span>/ 03</span><span>→</span></div>
  </div>
 </section>
 
@@ -233,7 +232,7 @@ export default function Page(){
 	<footer class="footer site-footer" id="footer">
 	 <div class="footer-main site-footer-grid">
 	  <div class="site-footer-brand"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><p>Architecture-led design and delivery<br>in Bengaluru.</p></div>
-	  <nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/contact">Contact</a></nav>
+	  <nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/gallery">Gallery</a><a href="/contact">Contact</a></nav>
 	  <div class="site-footer-col"><h2>Practice</h2><a href="/expertise">Architecture</a><a href="/expertise">Interiors</a><a href="/expertise">Construction</a><a href="/expertise#elevation">Approvals &amp; Coordination</a><a href="/expertise#elevation">Elevation Consultation</a></div>
 	  <div class="footer-contact site-footer-location"><h2>Based In</h2><strong>Bengaluru<br>Karnataka<br>India</strong><a href="/contact">Start a conversation <span>→</span></a></div>
 	 </div>
@@ -245,7 +244,7 @@ export default function Page(){
 <aside class="side site-side" id="side" aria-hidden="true">
  <div class="side-top site-side-top"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><button class="close site-close" id="menuClose" type="button">Close &nbsp; ×</button></div>
  <div class="side-label site-side-label">Menu</div>
- <nav class="side-nav site-side-nav"><a href="/">Home <span>01</span></a><a href="/projects">Projects <span>02</span></a><a href="/expertise">Expertise <span>03</span></a><a href="/journal">Journal <span>04</span></a><a href="/contact">Contact <span>05</span></a></nav>
+ <nav class="side-nav site-side-nav"><a href="/">Home <span>01</span></a><a href="/projects">Projects <span>02</span></a><a href="/expertise">Expertise <span>03</span></a><a href="/journal">Journal <span>04</span></a><a href="/gallery">Gallery <span>05</span></a><a href="/contact">Contact <span>06</span></a></nav>
  <div class="side-art"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="navigationMenuImage" data-fallback-src="Images/wireframe.jpg" alt=""><div class="side-words">Spaces<br>for a<br>better<br>tomorrow</div></div>
  <div class="side-foot site-side-foot"><div>Instagram<br>LinkedIn<br>YouTube</div><div class="cross site-cross" aria-hidden="true"></div></div>
 </aside>

@@ -399,6 +399,22 @@ nsBindProjectFilters();
         });
       });
     }
+    const galleryGrid = document.querySelector('[data-cms-gallery]');
+    if(galleryGrid){
+      const galleryItems = projects.flatMap(project => [
+        { project, image: project.image, label: 'Main image' },
+        { project, image: project.secondaryImage, label: 'Supporting image' }
+      ]).filter(item => item.image);
+      await nsWaitForImages(galleryItems.map(item => item.image));
+      galleryGrid.innerHTML = galleryItems.map(item => `
+        <a class="gallery-item" href="/project-detail?project=${encodeURIComponent(item.project.slug)}">
+          <span class="cms-image-shell">${nsImage(item.image, item.project.name)}</span>
+          <h2>${nsEscape(item.project.name)}</h2>
+          <p>${nsEscape(item.label)}</p>
+        </a>
+      `).join('');
+      nsInitImageLoading(galleryGrid);
+    }
     nsInitImageLoading(document);
   }));
 })();
