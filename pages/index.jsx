@@ -89,6 +89,22 @@ export default function Page(){
 .process-copy{justify-self:end;padding-top:18px;font-weight:500;color:var(--ink)}
 .process-foot{grid-template-columns:1fr minmax(280px,440px);gap:clamp(30px,8vw,120px)}
 .process-foot p{justify-self:end;max-width:430px;margin:0;font-size:14px;color:var(--text)}
+.consultants{padding:72px var(--g) 76px;background:#f8f7f2;border-top:1px solid var(--line)}
+.consultants-head{display:grid;grid-template-columns:1fr minmax(280px,430px);gap:clamp(30px,8vw,120px);align-items:end;margin-bottom:34px}
+.consultants h2{font:500 clamp(46px,4.8vw,76px)/.92 var(--serif);letter-spacing:-.025em;margin:14px 0 0;max-width:680px}
+.consultants-brand{border-left:1px solid var(--ink);padding-left:22px;color:var(--text);font-size:13px;line-height:1.7}
+.consultants-brand strong{display:block;color:var(--ink);font:500 22px var(--serif);letter-spacing:.18em;margin-bottom:6px}
+.consultants-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.consultant-card{background:#fff;border:1px solid var(--line);min-height:176px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:22px}
+.consultant-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.consultant-icon{width:48px;height:48px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;color:var(--ink);font:500 18px var(--serif);background:#f7f6ef}
+.consultant-card span{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.consultant-card h3{font:500 24px/1.05 var(--serif);letter-spacing:-.012em;margin:8px 0 0;color:var(--ink)}
+.consultant-card p{margin:8px 0 0;color:var(--text);font-size:12px;line-height:1.45}
+.consultant-card.featured{grid-column:span 2;background:var(--ink);color:#f8f7f2}
+.consultant-card.featured .consultant-icon{border-color:#f8f7f2;color:#f8f7f2;background:rgba(255,255,255,.08)}
+.consultant-card.featured span,.consultant-card.featured p{color:rgba(248,247,242,.75)}
+.consultant-card.featured h3{color:#f8f7f2;font-size:32px}
 .journal{padding:72px var(--g) 70px;background:linear-gradient(120deg,#fbfaf6,#f3f1eb);border-top:1px solid var(--line)}
 .journal-head{display:grid;grid-template-columns:1fr minmax(320px,520px);gap:44px;align-items:end;margin-bottom:36px}
 .journal h2{font:500 clamp(54px,5vw,86px)/.88 var(--serif);letter-spacing:-.03em;margin:18px 0 0}
@@ -111,10 +127,10 @@ export default function Page(){
 .footer-bottom{border-top:1px solid rgba(255,255,255,.18);margin-top:54px;padding-top:20px;display:flex;justify-content:space-between;gap:24px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,247,242,.68)}
 .head-actions{display:flex;align-items:center;gap:28px;font-size:13px}.menu-dot{width:48px;height:48px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:22px}.inquire{display:inline-flex;gap:18px;align-items:center}
 @media(min-width:1400px){.hero{grid-template-columns:39% 61%;min-height:720px}.hero-copy{padding-top:68px}.visual{min-height:720px}.card-image{height:210px;min-height:210px}.post img{height:220px}.process-visual,.process-visual .drawing-panel{min-height:300px}.process-visual img{height:300px}}
-@media(max-width:1280px){.project-grid{grid-template-columns:repeat(3,1fr)}.project-group{margin-top:18px}.card{min-height:330px}.header{grid-template-columns:230px 1fr auto}.nav{gap:22px}}
-@media(max-width:1100px){.project-grid{grid-template-columns:repeat(2,1fr)}.process-steps{grid-template-columns:1fr}.process-step{border-bottom:1px solid var(--line);padding-bottom:18px}.process-step:before{top:-5px}.process-visual{grid-template-columns:1fr}.process-visual .drawing-panel:after{content:"↓";right:auto;left:50%;top:auto;bottom:-24px;transform:translateX(-50%)}}
-@media(max-width:900px){.projects-head,.process-head,.journal-head,.footer-main{grid-template-columns:1fr}.projects-intro{justify-content:start}.project-tabs{justify-content:start}.stats{grid-template-columns:repeat(3,1fr)}.process-copy,.process-foot p,.journal-intro{justify-self:start}.process-foot{grid-template-columns:1fr}.journal-grid{grid-template-columns:1fr}.footer-links{grid-template-columns:1fr}.hero-copy{padding-right:var(--g)}.card-image{height:300px;min-height:300px}.post img{height:280px}}
-@media(max-width:700px){.hero-copy{min-height:auto;padding-top:40px;padding-bottom:42px}.actions{flex-wrap:wrap}.actions a{justify-content:space-between;min-width:190px}.visual,.visual img{min-height:430px}.projects,.process,.journal{padding-top:56px;padding-bottom:56px}.projects h2,.process h2,.journal h2{font-size:clamp(42px,12vw,58px)}.stats{gap:0}.stat{margin-right:18px;padding-right:18px}.process-visual,.process-visual .drawing-panel{min-height:230px}.process-visual img{height:230px}.footer-tag{margin-top:30px}}
+@media(max-width:1280px){.project-grid{grid-template-columns:repeat(3,1fr)}.project-group{margin-top:18px}.card{min-height:330px}.header{grid-template-columns:230px 1fr auto}.nav{gap:22px}.consultants-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1100px){.project-grid{grid-template-columns:repeat(2,1fr)}.process-steps{grid-template-columns:1fr}.process-step{border-bottom:1px solid var(--line);padding-bottom:18px}.process-step:before{top:-5px}.process-visual{grid-template-columns:1fr}.process-visual .drawing-panel:after{content:"↓";right:auto;left:50%;top:auto;bottom:-24px;transform:translateX(-50%)}.consultants-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.projects-head,.process-head,.consultants-head,.journal-head,.footer-main{grid-template-columns:1fr}.projects-intro{justify-content:start}.project-tabs{justify-content:start}.stats{grid-template-columns:repeat(3,1fr)}.process-copy,.process-foot p,.journal-intro{justify-self:start}.process-foot{grid-template-columns:1fr}.journal-grid{grid-template-columns:1fr}.footer-links{grid-template-columns:1fr}.hero-copy{padding-right:var(--g)}.card-image{height:300px;min-height:300px}.post img{height:280px}}
+@media(max-width:700px){.hero-copy{min-height:auto;padding-top:40px;padding-bottom:42px}.actions{flex-wrap:wrap}.actions a{justify-content:space-between;min-width:190px}.visual,.visual img{min-height:430px}.projects,.process,.consultants,.journal{padding-top:56px;padding-bottom:56px}.projects h2,.process h2,.consultants h2,.journal h2{font-size:clamp(42px,12vw,58px)}.stats{gap:0}.stat{margin-right:18px;padding-right:18px}.process-visual,.process-visual .drawing-panel{min-height:230px}.process-visual img{height:230px}.consultants-grid{grid-template-columns:1fr}.consultant-card.featured{grid-column:auto}.footer-tag{margin-top:30px}}
 @media(max-width:560px){.project-grid{grid-template-columns:1fr}.card{min-height:0}.card-image{height:270px;min-height:270px}.stats{grid-template-columns:1fr}.process{padding-top:54px}.process-foot{grid-template-columns:1fr}.journal,.footer{padding-left:var(--g);padding-right:var(--g)}.post img{height:220px}.footer-bottom{display:grid}}
 @media(max-width:430px){:root{--g:22px}.brand{gap:10px;font-size:16px}.mark{width:32px;height:32px;font-size:20px}.hero-copy{padding-top:34px}.lead{font-size:14px}.actions a{width:100%}.visual,.visual img{min-height:390px}.visual-meta{font-size:11px}.project-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.project-tabs span{text-align:center;padding:8px 6px}.card-image{height:238px;min-height:238px}.project-meta span{grid-template-columns:54px 1fr}.process-step{padding-right:0}.journal-intro{font-size:15px;gap:20px}.footer{padding-top:44px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
@@ -173,6 +189,22 @@ export default function Page(){
 	 </div>
 	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeProcessImage" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
 	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
+	</section>
+	<section class="consultants" id="consultants">
+	 <div class="consultants-head">
+	  <div><div class="eyebrow">Consultants</div><h2>The people shaping each decision.</h2></div>
+	  <div class="consultants-brand"><strong>N SQUARE VENTURES</strong><span>Architecture | Interiors | Construction</span></div>
+	 </div>
+	 <div class="consultants-grid">
+	  <article class="consultant-card featured"><div class="consultant-top"><span>Founder</span><div class="consultant-icon">FN</div></div><div><h3>Mohammed Nadeem Uzamah</h3><p>Leading design direction, client coordination and delivery vision.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Project Architect</span><div class="consultant-icon">AR</div></div><div><h3>Mohammed Nabeel</h3><p>Architecture planning, drawings and design coordination.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Structural Engineers</span><div class="consultant-icon">SE</div></div><div><h3>Pralabhi Associates</h3><p>Structural design inputs and technical coordination.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Pool Consultant</span><div class="consultant-icon">PL</div></div><div><h3>Millennium Pools</h3><p>Swimming pool systems, specifications and execution guidance.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Chartered Accountants</span><div class="consultant-icon">CA</div></div><div><h3>Puttaswamy &amp; Company</h3><p>Accounting, taxation and financial compliance support.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Finance &amp; Banking</span><div class="consultant-icon">FB</div></div><div><h3>Urban Money Corporate DSA</h3><p>Construction finance and banking consultation.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Legal Advisor</span><div class="consultant-icon">LA</div></div><div><h3>Mir Zia Ulla</h3><p>Advocate &amp; Notary of India.</p></div></article>
+	  <article class="consultant-card"><div class="consultant-top"><span>Mentor &amp; Strategic Advisor</span><div class="consultant-icon">MS</div></div><div><h3>Mr. N.M. Panali</h3><p>IAS (Retd.)</p></div></article>
+	 </div>
 	</section>
 	<!-- <section class="journal" id="journal">
 	 <div class="journal-head">
