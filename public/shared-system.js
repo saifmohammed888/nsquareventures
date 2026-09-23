@@ -54,6 +54,31 @@ const NSQUARE_CONTENT_READY = (async function(){
   }
 })();
 
+const NSQUARE_PRELOADED_IMAGES = new Set();
+
+function nsPreloadImage(src, priority){
+  if(!src || NSQUARE_PRELOADED_IMAGES.has(src)) return;
+  NSQUARE_PRELOADED_IMAGES.add(src);
+  if(priority){
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  }
+  const image = new Image();
+  image.decoding = 'async';
+  image.src = src;
+}
+
+function nsPreloadContentImages(content){
+  const images = [];
+  Object.values(content.site || {}).forEach(value => images.push(value));
+  (content.projects || []).forEach(project => images.push(project.image, project.secondaryImage));
+  (content.articles || []).forEach(article => images.push(article.image, article.secondaryImage));
+  images.filter(Boolean).slice(0, 80).forEach((src, index) => nsPreloadImage(src, index < 10));
+}
+
 function nsEscape(value){
   return String(value == null ? '' : value)
     .replace(/&/g, '&amp;')
@@ -71,7 +96,9 @@ function nsPrepareImage(img){
   if(!img || img.dataset.nsImageReady) return;
   img.dataset.nsImageReady = 'true';
   img.classList.add('cms-lazy-image');
-  if(!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+  const priority = Boolean(img.closest('.hero,.expert-hero,.jhero,.detail-hero,.article-hero,.visual,.heroimg,.jimage,.photo'));
+  if(!img.hasAttribute('loading')) img.setAttribute('loading', priority ? 'eager' : 'lazy');
+  if(priority && !img.hasAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'high');
   if(!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
   if(img.parentElement && !img.parentElement.classList.contains('cms-image-shell')){
     img.parentElement.classList.add('cms-image-shell');
@@ -251,6 +278,7 @@ nsBindProjectFilters();
 
 (function(){
   NSQUARE_CONTENT_READY.then(({ projects, articles, site }) => {
+    nsPreloadContentImages({ projects, articles, site });
     const siteAliases = {
       homeProcessImage: ['processImage']
     };
