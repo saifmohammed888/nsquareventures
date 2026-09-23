@@ -212,29 +212,35 @@ nsBindProjectFilters();
 
     document.title = `${article.title} — Nsquare Journal`;
     const body = Array.isArray(article.body) ? article.body : String(article.body || '').split('\n').filter(Boolean);
-    const takeaways = (article.takeaways || []).map(item => `<li>${nsEscape(item)}</li>`).join('');
+    const takeaways = (article.takeaways || []).map((item, index) => `<li><span>${String(index + 1).padStart(2, '0')}</span><p>${nsEscape(item)}</p></li>`).join('');
     const secondaryImage = article.secondaryImage
-      ? `<figure class="article-wide-image cms-image-shell">${nsImage(article.secondaryImage, `${article.title} supporting view`)}</figure>`
+      ? `<figure class="article-wide-image cms-image-shell">${nsImage(article.secondaryImage, `${article.title} supporting view`)}<figcaption>${nsEscape(article.title)} · Supporting reference</figcaption></figure>`
       : '';
     mount.innerHTML = `
       <section class="article-hero">
         <div class="article-copy">
-          <div class="eyebrow">${nsEscape(article.category)}</div>
+          <div class="article-overline"><span>Nsquare Journal</span><span>${nsEscape(article.category)}</span></div>
           <h1>${nsEscape(article.title)}</h1>
           <p>${nsEscape(article.summary)}</p>
+          <div class="article-actions"><a href="journal.html">Back to Journal <span>→</span></a><a href="/contact">Discuss a Project <span>→</span></a></div>
         </div>
         <div class="article-image cms-image-shell">${nsImage(article.image, article.alt || article.title)}</div>
       </section>
       <section class="article-body">
         <aside>
-          <div class="eyebrow">Nsquare Journal</div>
-          <a href="journal.html">Back to Journal <span>→</span></a>
+          <div class="article-side-card">
+            <div class="eyebrow">Article</div>
+            <strong>${nsEscape(article.category || 'Journal')}</strong>
+            <span>Nsquare Ventures</span>
+          </div>
+          <a href="journal.html">All articles <span>→</span></a>
         </aside>
         <article>
-          ${body.slice(0, 3).map(paragraph => `<p>${nsEscape(paragraph)}</p>`).join('')}
-          ${takeaways ? `<h2>Key considerations</h2><ul>${takeaways}</ul>` : ''}
+          <p class="article-summary">${nsEscape(article.summary)}</p>
+          ${body.slice(0, 2).map(paragraph => `<p>${nsEscape(paragraph)}</p>`).join('')}
+          ${takeaways ? `<section class="article-takeaways"><div class="eyebrow">Key considerations</div><ul>${takeaways}</ul></section>` : ''}
+          ${body.slice(2, 3).map(paragraph => `<p>${nsEscape(paragraph)}</p>`).join('')}
           ${secondaryImage}
-          <h2>Practice notes</h2>
           ${body.slice(3).map(paragraph => `<p>${nsEscape(paragraph)}</p>`).join('')}
         </article>
       </section>
