@@ -55,6 +55,19 @@ const NSQUARE_CONTENT_READY = (async function(){
 })();
 
 const NSQUARE_PRELOADED_IMAGES = new Set();
+let NSQUARE_PENDING_RENDERS = 0;
+
+function nsFinishPageLoading(){
+  document.documentElement.classList.add('ns-page-ready');
+}
+
+function nsTrackRender(promise){
+  NSQUARE_PENDING_RENDERS += 1;
+  Promise.resolve(promise).catch(() => {}).finally(() => {
+    NSQUARE_PENDING_RENDERS -= 1;
+    if(NSQUARE_PENDING_RENDERS <= 0) nsFinishPageLoading();
+  });
+}
 
 function nsPreloadImage(src, priority){
   if(!src || NSQUARE_PRELOADED_IMAGES.has(src)) return;
@@ -167,7 +180,7 @@ nsBindProjectFilters();
   const mount = document.getElementById('projectDetail');
   if(!mount) return;
 
-  NSQUARE_CONTENT_READY.then(async ({ projects }) => {
+  nsTrackRender(NSQUARE_CONTENT_READY.then(async ({ projects }) => {
     if(!projects.length) return;
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('project') || projects[0].slug;
@@ -210,7 +223,7 @@ nsBindProjectFilters();
       </section>
     `;
     nsInitImageLoading(mount);
-  });
+  }));
 })();
 
 (function(){
@@ -249,7 +262,7 @@ nsBindProjectFilters();
   const mount = document.getElementById('journalDetail');
   if(!mount) return;
 
-  NSQUARE_CONTENT_READY.then(async ({ articles }) => {
+  nsTrackRender(NSQUARE_CONTENT_READY.then(async ({ articles }) => {
     if(!articles.length) return;
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('article') || articles[0].slug;
@@ -297,11 +310,11 @@ nsBindProjectFilters();
       </section>
     `;
     nsInitImageLoading(mount);
-  });
+  }));
 })();
 
 (function(){
-  NSQUARE_CONTENT_READY.then(async ({ projects, articles, site }) => {
+  nsTrackRender(NSQUARE_CONTENT_READY.then(async ({ projects, articles, site }) => {
     nsPreloadContentImages({ projects, articles, site });
     const siteAliases = {
       homeProcessImage: ['processImage']
@@ -387,5 +400,5 @@ nsBindProjectFilters();
       });
     }
     nsInitImageLoading(document);
-  });
+  }));
 })();

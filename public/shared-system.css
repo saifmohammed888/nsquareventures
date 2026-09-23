@@ -15,6 +15,34 @@ html{scroll-behavior:smooth}
 body{background:var(--site-paper);color:var(--site-ink);font-family:var(--site-sans)}
 main{display:block}
 
+html.ns-page-loading:not(.ns-page-ready) body{
+  overflow:hidden;
+}
+html.ns-page-loading:not(.ns-page-ready) body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  background:#f8f7f2;
+}
+html.ns-page-loading:not(.ns-page-ready) body:after{
+  content:"";
+  position:fixed;
+  left:50%;
+  top:50%;
+  z-index:9999;
+  width:42px;
+  height:42px;
+  border:1px solid rgba(23,53,47,.18);
+  border-top-color:#17352f;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  animation:nsPageSpin .8s linear infinite;
+}
+@keyframes nsPageSpin{
+  to{transform:translate(-50%,-50%) rotate(360deg)}
+}
+
 .header,
 body>header{
   height:78px!important;
