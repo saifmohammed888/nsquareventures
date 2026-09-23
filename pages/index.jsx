@@ -81,7 +81,7 @@ export default function Page(){
 .process{background:linear-gradient(120deg,#fbfaf6,#f3f1eb)}
 .process-visual{grid-template-columns:1fr 1fr;align-items:stretch;margin-top:34px;min-height:260px}
 .process-visual .drawing-panel{min-height:260px;border-bottom:0;position:relative;background-color:rgba(255,255,255,.32);background-image:linear-gradient(rgba(23,53,47,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(23,53,47,.08) 1px,transparent 1px)}
-.process-visual .drawing-panel:before{content:"";position:absolute;inset:22px 0 18px 0;background:url("Images/wireframe.jpg") center/contain no-repeat;opacity:.68;filter:saturate(.15) contrast(1.05)}
+.process-visual .drawing-panel:before{content:"";position:absolute;inset:22px 0 18px 0;background:var(--cms-home-process-sketch, url("Images/wireframe.jpg")) center/contain no-repeat;opacity:.68;filter:saturate(.15) contrast(1.05)}
 .process-visual .drawing-panel:after{content:"→";position:absolute;right:-24px;top:50%;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--ink);box-shadow:0 10px 28px rgba(17,40,34,.14);transform:translateY(-50%);z-index:2;display:grid;place-items:center;font-size:22px}
 .process-visual img{height:260px;width:100%;object-fit:contain;background-color:rgba(255,255,255,.32);background-image:linear-gradient(rgba(23,53,47,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(23,53,47,.08) 1px,transparent 1px);background-size:74px 74px;padding:0;filter:saturate(.86) contrast(.95)}
 .process-foot{grid-template-columns:260px minmax(280px,470px);align-items:start;border-top:1px solid var(--line);padding-top:22px}
@@ -140,7 +140,7 @@ export default function Page(){
    <div class="hero-note">Architecture-led. Execution-aware.<br>From first sketch to site execution.</div>
  </div>
  <div class="visual">
-	   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-fallback-src="Images/Praveen Villa - Indiranagar.png" alt="Ravine Villa residential architecture">
+	   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeHeroImage" data-fallback-src="Images/Praveen Villa - Indiranagar.png" alt="Ravine Villa residential architecture">
    <div class="drawing"><svg viewBox="0 0 900 650" preserveAspectRatio="none"><path d="M0 510 L210 325 L365 405 L555 180 L900 260 M45 585 L45 90 M240 620 L240 40 M470 620 L470 80 M680 620 L680 20 M0 500 H900 M0 390 H900 M0 280 H900 M0 170 H900"/></svg></div>
    <div class="visual-meta">Spaces<br>people<br>belong in</div>
    <div class="location">Bengaluru · Karnataka</div>
@@ -171,7 +171,7 @@ export default function Page(){
 	  <div class="process-step"><strong>04</strong><b>Execute</b><span>Construction, detailing, procurement and site decisions.</span></div>
 	  <div class="process-step"><strong>05</strong><b>Deliver</b><span>Finishing, interiors, handover and post-completion support.</span></div>
 	 </div>
-	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
+	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeProcessImage" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
 	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
 	</section>
 	<!-- <section class="journal" id="journal">
@@ -201,7 +201,7 @@ export default function Page(){
  <div class="side-top site-side-top"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><button class="close site-close" id="menuClose" type="button">Close &nbsp; ×</button></div>
  <div class="side-label site-side-label">Menu</div>
  <nav class="side-nav site-side-nav"><a href="/">Home <span>01</span></a><a href="/projects">Projects <span>02</span></a><a href="/expertise">Expertise <span>03</span></a><a href="/journal">Journal <span>04</span></a><a href="/contact">Contact <span>05</span></a></nav>
- <div class="side-art"><img src="Images/wireframe.jpg" alt=""><div class="side-words">Spaces<br>for a<br>better<br>tomorrow</div></div>
+ <div class="side-art"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="navigationMenuImage" data-fallback-src="Images/wireframe.jpg" alt=""><div class="side-words">Spaces<br>for a<br>better<br>tomorrow</div></div>
  <div class="side-foot site-side-foot"><div>Instagram<br>LinkedIn<br>YouTube</div><div class="cross site-cross" aria-hidden="true"></div></div>
 </aside>
 

@@ -5,11 +5,31 @@ import { useEffect, useMemo, useState } from 'react';
 const emptyProject = { slug: 'new-project', name: 'New Project', status: 'ongoing', type: 'residential', location: '', area: '', client: '', image: '', secondaryImage: '', summary: '', details: '', scope: [] };
 const emptyArticle = { slug: 'new-blog', title: 'New Blog', category: 'Journal', categories: 'insights', image: '', secondaryImage: '', alt: '', summary: '', takeaways: [], body: [] };
 const siteImageFields = [
-  ['homeHeroImage', 'Home hero', 'Large image on the first homepage section.'],
-  ['projectsHeroImage', 'Projects hero', 'Main image at the top of Projects.'],
-  ['journalHeroImage', 'Journal hero', 'Main image at the top of Journal.'],
-  ['contactHeroImage', 'Contact hero', 'Main image on Contact.'],
-  ['processImage', 'Process image', 'Image used in the homepage process section.']
+  ['homeHeroImage', 'Home / Hero image', 'Main image on the home page hero.'],
+  ['homeProcessImage', 'Home / Process image', 'Built project image in the home process section.'],
+  ['homeProcessSketchImage', 'Home / Process sketch', 'Sketch background in the home process section.'],
+  ['navigationMenuImage', 'Navigation / Menu image', 'Small image inside the slide-out navigation menu.'],
+  ['projectsHeroImage', 'Projects / Hero image', 'Main image at the top of the Projects page.'],
+  ['projectsArtImage', 'Projects / Art image', 'Drawing image used in the Projects CTA/art panel.'],
+  ['journalHeroImage', 'Journal / Hero image', 'Main image at the top of the Journal page.'],
+  ['contactHeroImage', 'Contact / Hero image', 'Main image at the top of the Contact page.'],
+  ['expertiseSignatureImage', 'Expertise / Signature', 'Signature image beside the architect intro.'],
+  ['expertiseArchitectImage', 'Expertise / Architect portrait', 'Primary architect image in the Expertise hero.'],
+  ['expertiseQuoteBackgroundImage', 'Expertise / Quote background', 'Subtle background image behind the hero quote panel.'],
+  ['expertiseQuoteAccentImage', 'Expertise / Quote accent', 'Tall accent image beside the hero quote panel.'],
+  ['serviceArchitectureImage', 'Services / Architecture image', 'Image for Architecture & Planning service.'],
+  ['serviceElevationImage', 'Services / Elevation image', 'Image for Elevation Design service.'],
+  ['serviceApprovalsImage', 'Services / Approvals image', 'Image for Consulting & Approvals service.'],
+  ['serviceConstructionImage', 'Services / Construction image', 'Image for Construction Support service.'],
+  ['elevationQuoteBackgroundImage', 'Elevation / Quote background', 'Background image for the elevation quote block.'],
+  ['elevationProcessSketchImage', 'Elevation / Process sketch', 'First image in From Sketch to Street.'],
+  ['elevationProcessDevelopmentImage', 'Elevation / Process development', 'Second image in From Sketch to Street.'],
+  ['elevationProcessFinalImage', 'Elevation / Process final', 'Third image in From Sketch to Street.'],
+  ['elevationSelectedImage1', 'Elevation / Selected work 1', 'First selected elevation work image.'],
+  ['elevationSelectedImage2', 'Elevation / Selected work 2', 'Second selected elevation work image.'],
+  ['elevationSelectedImage3', 'Elevation / Selected work 3', 'Third selected elevation work image.'],
+  ['elevationSelectedImage4', 'Elevation / Selected work 4', 'Fourth selected elevation work image.'],
+  ['elevationSelectedImage5', 'Elevation / Selected work 5', 'Fifth selected elevation work image.']
 ];
 
 function slugify(value){ return String(value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }

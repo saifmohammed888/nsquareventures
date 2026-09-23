@@ -221,18 +221,30 @@ nsBindProjectFilters();
 
 (function(){
   NSQUARE_CONTENT_READY.then(({ projects, articles, site }) => {
-    const imageMap = [
-      ['homeHeroImage', '.visual > img'],
-      ['projectsHeroImage', '.heroimg > img'],
-      ['journalHeroImage', '.jimage > img'],
-      ['contactHeroImage', '.photo > img'],
-      ['processImage', '.process-visual > img']
+    const siteAliases = {
+      homeProcessImage: ['processImage']
+    };
+    function siteImageValue(key){
+      return site[key] || (siteAliases[key] || []).map(alias => site[alias]).find(Boolean);
+    }
+
+    document.querySelectorAll('img[data-cms-image]').forEach(img => {
+      const nextSrc = siteImageValue(img.dataset.cmsImage) || img.dataset.fallbackSrc;
+      if(nextSrc && img.src !== nextSrc) img.src = nextSrc;
+    });
+
+    const cssImageMap = [
+      ['homeProcessSketchImage', '--cms-home-process-sketch'],
+      ['projectsArtImage', '--cms-projects-art-image'],
+      ['expertiseQuoteBackgroundImage', '--cms-expertise-quote-background'],
+      ['expertiseQuoteAccentImage', '--cms-expertise-quote-accent'],
+      ['elevationQuoteBackgroundImage', '--cms-elevation-quote-background']
     ];
-    imageMap.forEach(([key, selector]) => {
-      document.querySelectorAll(selector).forEach(img => {
-        const nextSrc = site[key] || img.dataset.fallbackSrc;
-        if(nextSrc && img.src !== nextSrc) img.src = nextSrc;
-      });
+    cssImageMap.forEach(([key, variable]) => {
+      const image = siteImageValue(key);
+      if(image){
+        document.documentElement.style.setProperty(variable, `url("${String(image).replace(/"/g, '\\"')}")`);
+      }
     });
 
     const projectGrid = document.querySelector('.archive .grid');
