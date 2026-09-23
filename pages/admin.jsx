@@ -86,7 +86,9 @@ export default function Admin(){
   async function loadImages(){
     const response = await fetch('/api/images', { headers: authHeaders() });
     const data = await response.json();
-    if(response.ok) setImageOptions(data.images || []);
+    if(!response.ok) throw new Error(data.error || 'Unable to load image library.');
+    setImageOptions(data.images || []);
+    return data.images || [];
   }
 
   function login(event){
@@ -251,7 +253,7 @@ function ImageField({ label, value, target, uploading, onChange, onUpload, image
     if(!options.length) return null;
     return <optgroup label={title}>{options.map(image => <option key={image.url} value={image.url}>{image.label}</option>)}</optgroup>;
   }
-  return <div className="grid gap-2"><Field label={label}><TextInput value={value} onChange={event => onChange(event.target.value)} placeholder="Image path or uploaded Blob URL" /></Field><select value={value || ''} onChange={event => { if(event.target.value) onChange(event.target.value); }} className="h-11 border border-neutral-300 bg-white px-3 text-sm text-black"><option value="">Choose existing image...</option>{optionGroup('Uploaded to Blob', uploaded)}{optionGroup('Built-in Images folder', builtin)}</select><div className="flex flex-wrap items-center gap-2"><label className="inline-flex h-11 cursor-pointer items-center justify-center border border-neutral-300 bg-white px-4 text-sm font-semibold text-black hover:border-black">{uploading === target ? 'Uploading...' : 'Upload image'}<input type="file" accept="image/*" hidden onChange={event => onUpload(target, event.target.files?.[0])} /></label>{value ? <span className="max-w-full truncate text-xs text-neutral-500">{value}</span> : null}</div></div>;
+  return <div className="grid gap-2"><Field label={label}><TextInput value={value} onChange={event => onChange(event.target.value)} placeholder="Image path or uploaded Blob URL" /></Field><select value="" onChange={event => { if(event.target.value) onChange(event.target.value); }} className="h-11 border border-neutral-300 bg-white px-3 text-sm text-black"><option value="">{imageOptions.length ? `Choose existing image (${imageOptions.length})...` : 'No existing images loaded'}</option>{optionGroup('Uploaded to Blob', uploaded)}{optionGroup('Built-in Images folder', builtin)}</select><div className="flex flex-wrap items-center gap-2"><label className="inline-flex h-11 cursor-pointer items-center justify-center border border-neutral-300 bg-white px-4 text-sm font-semibold text-black hover:border-black">{uploading === target ? 'Uploading...' : 'Upload image'}<input type="file" accept="image/*" hidden onChange={event => onUpload(target, event.target.files?.[0])} /></label>{value ? <span className="max-w-full truncate text-xs text-neutral-500">{value}</span> : null}</div></div>;
 }
 
 function Repeat({ title, items, kind, textarea = false, onAdd, onUpdate, onRemove }){

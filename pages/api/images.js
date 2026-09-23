@@ -25,19 +25,23 @@ function walkImages(dir, baseDir, items){
 
 async function blobImages(){
   if(!process.env.BLOB_READ_WRITE_TOKEN) return [];
-  const { list } = await import('@vercel/blob');
-  const blobs = [];
-  let cursor;
-  do{
-    const page = await list({ prefix: 'cms/images/', cursor, limit: 1000 });
-    blobs.push(...page.blobs);
-    cursor = page.cursor;
-  }while(cursor);
-  return blobs.map(blob => ({
-    label: blob.pathname.replace(/^cms\/images\//, ''),
-    source: 'Uploaded',
-    url: blob.url
-  }));
+  try{
+    const { list } = await import('@vercel/blob');
+    const blobs = [];
+    let cursor;
+    do{
+      const page = await list({ prefix: 'cms/images/', cursor, limit: 1000 });
+      blobs.push(...page.blobs);
+      cursor = page.cursor;
+    }while(cursor);
+    return blobs.map(blob => ({
+      label: blob.pathname.replace(/^cms\/images\//, ''),
+      source: 'Uploaded',
+      url: blob.url
+    }));
+  }catch(error){
+    return [];
+  }
 }
 
 export default async function handler(req, res){
@@ -54,7 +58,8 @@ export default async function handler(req, res){
     const builtin = [];
     walkImages(path.join(process.cwd(), 'public', 'Images'), path.join(process.cwd(), 'public'), builtin);
     const uploaded = await blobImages();
-    return res.status(200).json({ images: [...uploaded, ...builtin] });
+    const images = [...uploaded, ...builtin].sort((a, b) => `${a.source} ${a.label}`.localeCompare(`${b.source} ${b.label}`));
+    return res.status(200).json({ images });
   }catch(error){
     return res.status(500).json({ error: error.message || 'Unable to list images.' });
   }
