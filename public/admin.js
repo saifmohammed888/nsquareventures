@@ -133,6 +133,7 @@
     content = await request('/api/content');
     content.projects ||= [];
     content.articles ||= [];
+    content.media ||= [];
     content.site ||= {};
     selectedProject = Math.min(selectedProject, Math.max(content.projects.length - 1, 0));
     selectedArticle = Math.min(selectedArticle, Math.max(content.articles.length - 1, 0));
@@ -143,7 +144,7 @@
   async function saveContent(){
     try{
       const raw = JSON.parse($('#rawEditor').value || '{}');
-      content = { projects: raw.projects || content.projects, articles: raw.articles || content.articles, site: raw.site || content.site };
+      content = { projects: raw.projects || content.projects, articles: raw.articles || content.articles, media: raw.media || content.media || [], site: raw.site || content.site };
     }catch(error){}
     setStatus('Saving changes...');
     await request('/api/content', {
@@ -183,6 +184,8 @@
       headers: { 'content-type': file.type || 'application/octet-stream' },
       body: file
     });
+    content.media ||= [];
+    content.media.unshift({ id: `${Date.now()}`, name: file.name.replace(/\.[^.]+$/, ''), description: '', url: result.url, createdAt: new Date().toISOString() });
     applyUploadedUrl(result.url);
     setStatus('Image uploaded and placed in the selected field.');
   }

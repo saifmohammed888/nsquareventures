@@ -110,14 +110,18 @@ export default function Admin(){
     setStatus('Saving...');
     try{
       const body = tab === 'raw' ? JSON.parse(raw || '{}') : content;
-      const response = await fetch('/api/content', { method: 'POST', headers: authHeaders({ 'content-type': 'application/json' }), body: JSON.stringify(body) });
-      const data = await response.json();
-      if(!response.ok) throw new Error(data.error || 'Unable to save content.');
-      const saved = sync({ projects: data.content.projects || [], articles: data.content.articles || [], media: data.content.media || [], site: data.content.site || {} });
+      const saved = await writeContent(body);
       setContent(saved);
       setStatus('Saved. Refresh the public site to see updates.');
     }catch(error){ setStatus(error.message); }
     finally{ setSaving(false); }
+  }
+
+  async function writeContent(body){
+    const response = await fetch('/api/content', { method: 'POST', headers: authHeaders({ 'content-type': 'application/json' }), body: JSON.stringify(body) });
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || 'Unable to save content.');
+    return sync({ projects: data.content.projects || [], articles: data.content.articles || [], media: data.content.media || [], site: data.content.site || {} });
   }
 
   function logout(){ sessionStorage.removeItem('nsquare_cms_password'); setAuthed(false); setPassword(''); setStatus('Locked.'); }
@@ -177,10 +181,16 @@ export default function Admin(){
       const data = await response.json();
       if(!response.ok) throw new Error(data.error || 'Upload failed.');
       const mediaItem = { id: `${Date.now()}`, name, description: mediaDraft.description.trim(), url: data.url, createdAt: new Date().toISOString() };
-      setContent(current => sync({ ...current, media: [mediaItem, ...(current.media || [])] }));
+      let nextContent;
+      setContent(current => {
+        nextContent = sync({ ...current, media: [mediaItem, ...(current.media || [])] });
+        return nextContent;
+      });
+      const saved = await writeContent(nextContent);
+      setContent(saved);
       setMediaDraft({ name: '', description: '', file: null });
       await loadImages();
-      setStatus('Image added to media library. Save changes to keep its name and description.');
+      setStatus('Image added and saved to media library.');
     }catch(error){ setStatus(error.message); }
     finally{ setUploading(''); }
   }
