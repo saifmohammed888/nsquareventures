@@ -5,7 +5,10 @@ import { ContactCTA, Layout, useContent } from '../../components/Public';
 const assetUrl = url => /^(https?:\/\/|\/)/i.test(url || '') ? url : `/${url}`;
 
 function ProjectDetails({ project }) {
-  const images = [project.image, ...(project.secondaryImages || [])]
+  // Keep legacy projects (which stored one `secondaryImage`) working alongside
+  // the current multi-image gallery field.
+  const additionalImages = Array.isArray(project.secondaryImages) ? project.secondaryImages : [];
+  const images = [project.image, ...additionalImages, project.secondaryImage]
     .filter(Boolean)
     .filter(image => image === project.image || !/wireframe|signature|architect-|favicon|logo/i.test(image))
     .filter((image, index, list) => list.indexOf(image) === index)
@@ -34,7 +37,7 @@ function ProjectDetails({ project }) {
             </div>
           )}
         </div>
-        <div className="ns-project-image-stack"><Carousel slides={images} controls={false} duration={3} transition={0.6} /></div>
+        <div className="ns-project-image-stack"><Carousel slides={images} controls={images.length > 1} duration={3} transition={0.6} /></div>
       </section>
     </>
   );
