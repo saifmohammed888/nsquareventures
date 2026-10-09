@@ -5,7 +5,7 @@ import { ContactCTA, Layout, useContent } from '../../components/Public';
 const assetUrl = url => /^(https?:\/\/|\/)/i.test(url || '') ? url : `/${url}`;
 
 function ProjectDetails({ project }) {
-  const images = [project.image, project.secondaryImage]
+  const images = [project.image, ...(project.secondaryImages || [])]
     .filter(Boolean)
     .filter(image => image === project.image || !/wireframe|signature|architect-|favicon|logo/i.test(image))
     .filter((image, index, list) => list.indexOf(image) === index)

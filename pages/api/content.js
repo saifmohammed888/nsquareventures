@@ -10,7 +10,10 @@ const { migrate, publicContent } = require('../../lib/content-model');
 export default async function handler(req, res){
   if(req.method === 'GET'){
     res.setHeader('Cache-Control', 'no-store');
-    if(req.headers['x-cms-password'] && !authorized(req)) return res.status(401).json({error:'Unauthorized'});
+    const adminRequest = String(req.query?.admin || '') === '1';
+    // Public pages can read filtered content without credentials.  The CMS
+    // explicitly asks for an administrative read and must always authenticate.
+    if((adminRequest || req.headers['x-cms-password']) && !authorized(req)) return res.status(401).json({error:'Unauthorized'});
     try{
       const storedContent = await readStoredContent();
       const content = migrate(storedContent || defaultContent());

@@ -1,9 +1,9 @@
-import WebsiteEditor, {ProjectFields,ImagePicker} from '../components/WebsiteEditor';
+import WebsiteEditor, {ProjectFields,ImagePicker,ImageListPicker} from '../components/WebsiteEditor';
 import Head from 'next/head';
 import Script from 'next/script';
 import { useEffect, useMemo, useState } from 'react';
 
-const emptyProject = { slug: 'new-project', name: 'New Project', status: 'ongoing', published: false, tagIds: [], type: '', location: '', area: '', client: '', image: '', secondaryImage: '', summary: '', details: '', scope: [] };
+const emptyProject = { slug: 'new-work', name: 'New Work', status: 'ongoing', published: false, tagIds: [], type: '', location: '', area: '', client: '', image: '', secondaryImages: [], summary: '', details: '', scope: [] };
 const emptyArticle = { slug: 'new-blog', title: 'New Blog', category: 'Journal', categories: 'insights', image: '', secondaryImage: '', alt: '', summary: '', takeaways: [], body: [] };
 const siteImageFields = [
   ['homeHeroImage', 'Home / Hero image', 'Main image on the home page hero.'],
@@ -51,10 +51,11 @@ export default function Admin(){
   const [projectIndex, setProjectIndex] = useState(0);
   const [articleIndex, setArticleIndex] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [uploading, setUploading] = useState('');
   const [raw, setRaw] = useState('');
   const [imageOptions, setImageOptions] = useState([]);
-  const [mediaDraft, setMediaDraft] = useState({ name: '', description: '', file: null });
+  const [mediaDraft, setMediaDraft] = useState({ name: '', description: '', files: [] });
   const [mediaSearch, setMediaSearch] = useState('');
 
   const project = content.projects[projectIndex] || null;
@@ -64,12 +65,18 @@ export default function Admin(){
     const known = new Set(library.map(item => item.url));
     return [...library, ...imageOptions.filter(item => !known.has(item.url))];
   }, [content.media, imageOptions]);
-  const stats = useMemo(() => [['Projects', content.projects.length], ['Ongoing', content.projects.filter(project => project.status !== 'completed').length], ['Completed', content.projects.filter(project => project.status === 'completed').length], ['Blogs', content.articles.length], ['Media', (content.media || []).length], ['Site images', Object.values(content.site || {}).filter(Boolean).length]], [content]);
-  const pageTitle = tab === 'website' ? 'Website' : tab === 'projects' ? 'Projects' : tab === 'blogs' ? 'Blogs' : tab === 'images' ? 'Media / Images' : tab === 'site' ? 'Site Content' : 'Advanced Settings';
+  const stats = useMemo(() => [['Works', content.projects.length], ['Ongoing', content.projects.filter(project => project.status !== 'completed').length], ['Completed', content.projects.filter(project => project.status === 'completed').length], ['Media', (content.media || []).length], ['Site images', Object.values(content.site || {}).filter(Boolean).length]], [content]);
+  const pageTitle = tab === 'website' ? 'Website' : tab === 'projects' ? 'Works' : tab === 'presentation' ? 'Slideshow Manager' : tab === 'images' ? 'Media / Images' : tab === 'site' ? 'Site Content' : 'Advanced Settings';
 
   useEffect(() => {
     const saved = sessionStorage.getItem('nsquare_cms_password') || '';
-    if(saved){ setPassword(saved); setAuthed(true); }
+    if(!saved) return;
+    setPassword(saved);
+    setVerifying(true);
+    verifyPassword(saved)
+      .then(() => { setAuthed(true); setStatus('Unlocked.'); })
+      .catch(() => { sessionStorage.removeItem('nsquare_cms_password'); setStatus('Password verification failed.'); })
+      .finally(() => setVerifying(false));
   }, []);
 
   useEffect(() => {
@@ -77,6 +84,13 @@ export default function Admin(){
   }, [authed]);
 
   function authHeaders(extra = {}){ return { ...extra, 'x-cms-password': password }; }
+  async function verifyPassword(candidate){
+    const response = await fetch('/api/content?admin=1', { headers: { 'x-cms-password': candidate } });
+    if(!response.ok){
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || 'Password verification failed.');
+    }
+  }
   function sync(next){ setRaw(JSON.stringify(next, null, 2)); return next; }
   function mergeUploadedImages(next, images = imageOptions){
     const media = next.media || [];
@@ -91,13 +105,20 @@ export default function Admin(){
     setStatus('Loading content...');
     const response = await fetch('/api/content', { headers: authHeaders() });
     const data = await response.json();
-    if(!response.ok) throw new Error(data.error || 'Unable to load content.');
+    if(!response.ok){
+      if(response.status === 401){
+        sessionStorage.removeItem('nsquare_cms_password');
+        setAuthed(false);
+        setPassword('');
+      }
+      throw new Error(data.error || 'Unable to load content.');
+    }
     const images = await loadImages();
     const next = sync(mergeUploadedImages({ ...data, projects: data.projects || [], articles: data.articles || [], media: data.media || [], site: data.site || {} }, images));
     setContent(next);
     setProjectIndex(0);
     setArticleIndex(0);
-    setStatus(`Loaded ${next.projects.length} projects and ${next.articles.length} blogs.`);
+    setStatus(`Loaded ${next.projects.length} works.`);
   }
 
   async function loadImages(){
@@ -108,10 +129,20 @@ export default function Admin(){
     return data.images || [];
   }
 
-  function login(event){
+  async function login(event){
     event.preventDefault();
-    sessionStorage.setItem('nsquare_cms_password', password);
-    setAuthed(true);
+    setVerifying(true);
+    setStatus('Verifying password...');
+    try{
+      await verifyPassword(password);
+      sessionStorage.setItem('nsquare_cms_password', password);
+      setAuthed(true);
+      setStatus('Unlocked.');
+    }catch(error){
+      sessionStorage.removeItem('nsquare_cms_password');
+      setAuthed(false);
+      setStatus(error.message || 'Password verification failed.');
+    }finally{ setVerifying(false); }
   }
 
   async function saveContent(){
@@ -181,22 +212,25 @@ export default function Admin(){
 
   async function uploadMedia(event){
     event.preventDefault();
-    if(!mediaDraft.file) return setStatus('Choose an image file first.');
-    const name = mediaDraft.name.trim() || mediaDraft.file.name.replace(/\.[^.]+$/, '');
+    const files = mediaDraft.files || [];
+    if(!files.length) return setStatus('Choose one or more image files first.');
     setUploading('media');
-    setStatus(`Uploading ${name}...`);
+    setStatus(`Uploading ${files.length} image${files.length === 1 ? '' : 's'}...`);
     try{
-      const response = await fetch(`/api/upload?filename=${encodeURIComponent(name || mediaDraft.file.name)}`, { method: 'POST', headers: authHeaders({ 'content-type': mediaDraft.file.type || 'application/octet-stream' }), body: mediaDraft.file });
-      const data = await response.json();
-      if(!response.ok) throw new Error(data.error || 'Upload failed.');
-      const mediaItem = { id: `${Date.now()}`, name, description: mediaDraft.description.trim(), url: data.url, createdAt: new Date().toISOString() };
-      const nextContent = sync(mergeUploadedImages({ ...content, media: [mediaItem, ...(content.media || [])] }));
+      const uploads = await Promise.all(files.map(async (file, index) => {
+        const name = files.length === 1 && mediaDraft.name.trim() ? mediaDraft.name.trim() : file.name.replace(/\.[^.]+$/, '');
+        const response = await fetch(`/api/upload?filename=${encodeURIComponent(name || file.name)}`, { method: 'POST', headers: authHeaders({ 'content-type': file.type || 'application/octet-stream' }), body: file });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || `Unable to upload ${file.name}.`);
+        return { id: `${Date.now()}-${index}`, name, description: mediaDraft.description.trim(), url: data.url, createdAt: new Date().toISOString() };
+      }));
+      const nextContent = sync(mergeUploadedImages({ ...content, media: [...uploads, ...(content.media || [])] }));
       setContent(nextContent);
       const saved = await writeContent(nextContent);
       setContent(saved);
-      setMediaDraft({ name: '', description: '', file: null });
+      setMediaDraft({ name: '', description: '', files: [] });
       await loadImages();
-      setStatus('Image added and saved to media library.');
+      setStatus(`${uploads.length} image${uploads.length === 1 ? '' : 's'} added to the media library.`);
     }catch(error){ setStatus(error.message); }
     finally{ setUploading(''); }
   }
@@ -212,7 +246,8 @@ export default function Admin(){
             <h1 className="mt-4 text-4xl font-semibold tracking-tight">Nsquare CMS</h1>
             <p className="mt-3 text-sm leading-6 text-neutral-600">Enter the CMS password to manage projects, blog posts, and site imagery.</p>
             <div className="mt-6"><Field label="Password"><TextInput type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" required /></Field></div>
-            <Button className="mt-5 w-full" type="submit">Open CMS</Button>
+            <Button className="mt-5 w-full" type="submit" disabled={verifying}>{verifying ? 'Verifying…' : 'Open CMS'}</Button>
+            {status !== 'Locked.' && <p className="mt-3 text-sm text-red-700" role="alert">{status}</p>}
           </form>
         </main>
       </>
@@ -226,7 +261,7 @@ export default function Admin(){
       <main className="min-h-screen bg-[#F7F8F5] text-[#102A24]">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r cms-border bg-[#FBFCF9] p-5 lg:flex lg:flex-col">
           <div><p className="font-serif text-lg tracking-[0.18em] cms-text">N SQUARE VENTURES</p><p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">CMS</p></div>
-          <nav className="mt-10 grid gap-1">{[['website','Website',null],['projects','Works',content.projects.length],['blogs','Blogs',content.articles.length],['images','Media / Images',(content.media || []).length],['site','Site Content',Object.values(content.site || {}).filter(Boolean).length],['raw','Advanced / Settings',null]].map(([key,label,count]) => <button key={key} onClick={() => setTab(key)} className={cx('flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold transition', tab === key ? 'bg-[#E9EFEB] cms-text' : 'text-slate-700 hover:bg-white')}><span>{label}</span>{count != null && <span className="rounded-full bg-[#E9EFEB] px-2 py-0.5 text-xs cms-text">{count}</span>}</button>)}</nav>
+          <nav className="mt-10 grid gap-1">{[['website','Website',null],['projects','Works',content.projects.length],['presentation','Slideshow Manager',null],['images','Media / Images',(content.media || []).length],['raw','Advanced / Settings',null]].map(([key,label,count]) => <button key={key} onClick={() => setTab(key)} className={cx('flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold transition', tab === key ? 'bg-[#E9EFEB] cms-text' : 'text-slate-700 hover:bg-white')}><span>{label}</span>{count != null && <span className="rounded-full bg-[#E9EFEB] px-2 py-0.5 text-xs cms-text">{count}</span>}</button>)}</nav>
           <div className="mt-auto grid gap-3"><a href="/" target="_blank" className="text-sm font-semibold cms-text">View Site ↗</a><div className="flex items-center gap-3 border-t cms-border pt-5"><div className="grid h-10 w-10 place-items-center rounded-full cms-green text-sm font-semibold text-white">NU</div><div><b className="block text-sm">Nsquare CMS</b><span className="text-xs text-slate-500">Administrator</span></div></div></div>
         </aside>
         <section className="lg:pl-64">
@@ -239,13 +274,12 @@ export default function Admin(){
 
         <div className="grid gap-5 px-5 py-6">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{stats.map(([label, value]) => <div key={label} className="rounded-lg border cms-border bg-white p-4"><span className="text-xs text-slate-500">{label}</span><b className="mt-1 block text-2xl cms-text">{value}</b></div>)}</div>
-          <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="website">Website</option><option value="projects">Works</option><option value="blogs">Blogs</option><option value="images">Media / Images</option><option value="site">Site Content</option><option value="raw">Advanced / Settings</option></select></div>
+          <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="website">Website</option><option value="projects">Works</option><option value="presentation">Slideshow Manager</option><option value="images">Media / Images</option><option value="raw">Advanced / Settings</option></select></div>
 
           {tab === 'website' && <WebsiteEditor content={content} onChange={next=>setContent(sync(next))} images={mediaOptions}/>}
+          {tab === 'presentation' && <WebsiteEditor content={content} onChange={next=>setContent(sync(next))} images={mediaOptions} initialSection="Presentation"/>}
           {tab === 'projects' && <ProjectsTab imageOptions={mediaOptions} content={content} setContent={setContent} project={project} projectIndex={projectIndex} setProjectIndex={setProjectIndex} updateProject={updateProject} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} />}
-          {tab === 'blogs' && <BlogsTab imageOptions={mediaOptions} content={content} setContent={setContent} article={article} articleIndex={articleIndex} setArticleIndex={setArticleIndex} updateArticle={updateArticle} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} />}
-          {tab === 'images' && <ImagesTab imageOptions={mediaOptions} content={content} setContent={setContent} uploading={uploading} mediaDraft={mediaDraft} setMediaDraft={setMediaDraft} uploadMedia={uploadMedia} sync={sync} mediaSearch={mediaSearch} setMediaSearch={setMediaSearch} />}
-          {tab === 'site' && <SiteContentTab imageOptions={mediaOptions} content={content} updateSite={updateSite} />}
+          {tab === 'images' && <ImagesTab imageOptions={mediaOptions} content={content} setContent={setContent} uploading={uploading} mediaDraft={mediaDraft} setMediaDraft={setMediaDraft} uploadMedia={uploadMedia} sync={sync} mediaSearch={mediaSearch} setMediaSearch={setMediaSearch} writeContent={writeContent} loadImages={loadImages} setStatus={setStatus} authHeaders={authHeaders} />}
           {tab === 'raw' && <Editor title="Advanced JSON"><p className="text-sm text-neutral-600">Use this only for debugging or bulk copy/paste edits.</p><textarea value={raw} onChange={event => setRaw(event.target.value)} spellCheck={false} className="min-h-[620px] w-full border border-neutral-300 bg-white p-4 font-mono text-xs outline-none focus:border-black" /></Editor>}
         </div>
         </section>
@@ -255,20 +289,43 @@ export default function Admin(){
 }
 
 function ProjectsTab({ content, setContent, project, projectIndex, setProjectIndex, updateProject, updateList, addListItem, removeListItem, sync, imageOptions }){
-  return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Projects" items={content.projects} active={projectIndex} onSelect={setProjectIndex} onAdd={() => { setContent(current => sync({ ...current, projects: [...current.projects, { ...emptyProject }] })); setProjectIndex(content.projects.length); }} label={item => item.name} sublabel={item => `${item.status || 'draft'} · ${item.location || 'No location'}`} />{project && <Editor title={project.name || 'Project'}><ProjectFields project={project} tags={content.tags} onChange={updateProject}/><Preview image={project.image} title={project.name} text={project.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Project name"><TextInput value={project.name || ''} onChange={event => updateProject('name', event.target.value)} /></Field><Field label="Slug"><TextInput value={project.slug || ''} onChange={event => updateProject('slug', event.target.value)} /></Field><ProjectStatusControl value={project.status || 'ongoing'} onChange={value => updateProject('status', value)} /><Field label="Location"><TextInput value={project.location || ''} onChange={event => updateProject('location', event.target.value)} /></Field><Field label="Area"><TextInput value={project.area || ''} onChange={event => updateProject('area', event.target.value)} /></Field><Field label="Client / owner"><TextInput value={project.client || ''} onChange={event => updateProject('client', event.target.value)} /></Field></div><div className="grid gap-4 md:grid-cols-2"><ImageField label="Main image" value={project.image || ''} onChange={value => updateProject('image', value)} imageOptions={imageOptions} /><ImageField label="Second image" value={project.secondaryImage || ''} onChange={value => updateProject('secondaryImage', value)} imageOptions={imageOptions} /></div><Field label="Short card summary"><TextArea rows={3} value={project.summary || ''} onChange={event => updateProject('summary', event.target.value)} /></Field><Field label="Project detail text"><TextArea rows={5} value={project.details || ''} onChange={event => updateProject('details', event.target.value)} /></Field><Repeat title="Scope" items={project.scope || []} kind="scope" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><Button tone="danger" onClick={() => { if(confirm('Delete this project?')) setContent(current => sync({ ...current, projects: current.projects.filter((_, i) => i !== projectIndex) })); }}>Delete project</Button></Editor>}</section>;
+  return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Works" items={content.projects} active={projectIndex} onSelect={setProjectIndex} onAdd={() => { setContent(current => sync({ ...current, projects: [...current.projects, { ...emptyProject }] })); setProjectIndex(content.projects.length); }} label={item => item.name} sublabel={item => `${item.status || 'draft'} · ${item.location || 'No location'}`} />{project && <Editor title={project.name || 'Work'}><ProjectFields project={project} tags={content.tags} onChange={updateProject}/><Preview image={project.image} title={project.name} text={project.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Work name"><TextInput value={project.name || ''} onChange={event => updateProject('name', event.target.value)} /></Field><Field label="Slug"><TextInput value={project.slug || ''} onChange={event => updateProject('slug', event.target.value)} /></Field><ProjectStatusControl value={project.status || 'ongoing'} onChange={value => updateProject('status', value)} /><Field label="Location"><TextInput value={project.location || ''} onChange={event => updateProject('location', event.target.value)} /></Field><Field label="Area"><TextInput value={project.area || ''} onChange={event => updateProject('area', event.target.value)} /></Field><Field label="Client / owner"><TextInput value={project.client || ''} onChange={event => updateProject('client', event.target.value)} /></Field></div><div className="grid gap-4"><ImageField label="Primary image" value={project.image || ''} onChange={value => updateProject('image', value)} imageOptions={imageOptions} /><ImageListPicker label="Additional work images" values={project.secondaryImages || (project.secondaryImage ? [project.secondaryImage] : [])} onChange={value => updateProject('secondaryImages', value)} imageOptions={imageOptions} /></div><Field label="Short card summary"><TextArea rows={3} value={project.summary || ''} onChange={event => updateProject('summary', event.target.value)} /></Field><Field label="Work detail text"><TextArea rows={5} value={project.details || ''} onChange={event => updateProject('details', event.target.value)} /></Field><Repeat title="Scope" items={project.scope || []} kind="scope" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><Button tone="danger" onClick={() => { if(confirm('Delete this work?')) setContent(current => sync({ ...current, projects: current.projects.filter((_, i) => i !== projectIndex) })); }}>Delete work</Button></Editor>}</section>;
 }
 
 function BlogsTab({ content, setContent, article, articleIndex, setArticleIndex, updateArticle, updateList, addListItem, removeListItem, sync, imageOptions }){
   return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Blogs" items={content.articles} active={articleIndex} onSelect={setArticleIndex} onAdd={() => { setContent(current => sync({ ...current, articles: [...current.articles, { ...emptyArticle }] })); setArticleIndex(content.articles.length); }} label={item => item.title} sublabel={item => item.category || 'No category'} />{article && <Editor title={article.title || 'Blog'}><Preview image={article.image} title={article.title} text={article.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Title"><TextInput value={article.title || ''} onChange={event => updateArticle('title', event.target.value)} /></Field><Field label="Slug"><TextInput value={article.slug || ''} onChange={event => updateArticle('slug', event.target.value)} /></Field><Field label="Display category"><TextInput value={article.category || ''} onChange={event => updateArticle('category', event.target.value)} /></Field><Field label="Filter keywords"><TextInput value={article.categories || ''} onChange={event => updateArticle('categories', event.target.value)} /></Field><Field label="Image alt text"><TextInput value={article.alt || ''} onChange={event => updateArticle('alt', event.target.value)} /></Field></div><div className="grid gap-4 md:grid-cols-2"><ImageField label="Main blog image" value={article.image || ''} onChange={value => updateArticle('image', value)} imageOptions={imageOptions} /><ImageField label="Supporting image" value={article.secondaryImage || ''} onChange={value => updateArticle('secondaryImage', value)} imageOptions={imageOptions} /></div><Field label="Short summary"><TextArea rows={3} value={article.summary || ''} onChange={event => updateArticle('summary', event.target.value)} /></Field><Repeat title="Takeaways" items={article.takeaways || []} kind="takeaways" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><Repeat title="Article paragraphs" textarea items={article.body || []} kind="body" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><Button tone="danger" onClick={() => { if(confirm('Delete this blog?')) setContent(current => sync({ ...current, articles: current.articles.filter((_, i) => i !== articleIndex) })); }}>Delete blog</Button></Editor>}</section>;
 }
 
-function ImagesTab({ imageOptions, content, setContent, uploading, mediaDraft, setMediaDraft, uploadMedia, sync, mediaSearch, setMediaSearch }){
-  function removeMedia(id){ if(confirm('Remove this media record? Blob file stays stored, but it disappears from the named library.')) setContent(current => sync({ ...current, media: (current.media || []).filter(item => item.id !== id) })); }
+function ImagesTab({ imageOptions, content, setContent, uploading, mediaDraft, setMediaDraft, uploadMedia, sync, mediaSearch, setMediaSearch, writeContent, loadImages, setStatus, authHeaders }){
+  async function removeMedia(item){
+    if(!confirm(`Permanently delete ${item.name || 'this image'}? This cannot be undone.`)) return;
+    const inUse = [
+      ...(content.projects || []).flatMap(work => [work.image, ...(work.secondaryImages || []), work.secondaryImage]),
+      ...(content.home?.slides || []).map(slide => slide.image),
+      ...(content.presentation?.images || []).map(slide => slide.image),
+      ...(content.associates || []).map(person => person.image),
+      ...(content.staff || []).map(person => person.image)
+    ].includes(item.url);
+    if(inUse){ setStatus('This image is in use. Remove or replace it from the related content before deleting it.'); return; }
+    setStatus('Deleting image...');
+    try{
+      if(/^https:\/\/[^/]+\.blob\.vercel-storage\.com\/cms\/images\//.test(item.url)){
+        const response = await fetch(`/api/upload?url=${encodeURIComponent(item.url)}`, { method: 'DELETE', headers: authHeaders() });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || 'Unable to delete the uploaded image.');
+      }
+      const next = sync({ ...content, media: (content.media || []).filter(entry => entry.url !== item.url) });
+      const saved = await writeContent(next);
+      setContent(saved);
+      await loadImages();
+      setStatus('Image removed from the media library.');
+    }catch(error){ setStatus(error.message || 'Unable to remove image.'); }
+  }
   const savedMedia = content.media || [];
   const savedUrls = new Set(savedMedia.map(item => item.url));
   const blobMedia = imageOptions.filter(item => item.source === 'Uploaded' && !savedUrls.has(item.url)).map(item => ({ id: item.url, name: item.label || 'Uploaded image', description: 'Uploaded Blob image', url: item.url }));
   const items = [...savedMedia, ...blobMedia].filter(item => `${item.name || ''} ${item.description || ''}`.toLowerCase().includes(mediaSearch.toLowerCase()));
-  return <section className="grid gap-5"><Editor title="Upload Images"><form onSubmit={uploadMedia} onDrop={event => { event.preventDefault(); const file = event.dataTransfer.files?.[0]; if(file) setMediaDraft(current => ({ ...current, file, name: current.name || file.name.replace(/\.[^.]+$/, '') })); }} onDragOver={event => event.preventDefault()} className="grid gap-4 rounded-lg border border-dashed border-slate-300 bg-[#FAFBF8] p-6 lg:grid-cols-[1fr_1fr_auto] lg:items-end"><Field label="Image name"><TextInput value={mediaDraft.name} onChange={event => setMediaDraft(current => ({ ...current, name: event.target.value }))} placeholder="Homepage hero, Nadeem portrait..." /></Field><Field label="Description"><TextInput value={mediaDraft.description} onChange={event => setMediaDraft(current => ({ ...current, description: event.target.value }))} placeholder="Where this image is useful" /></Field><label className="grid gap-2 text-xs font-semibold uppercase tracking-wide text-neutral-600"><span>File</span><input type="file" accept="image/*" onChange={event => setMediaDraft(current => ({ ...current, file: event.target.files?.[0] || null, name: current.name || event.target.files?.[0]?.name?.replace(/\.[^.]+$/, '') || '' }))} className="block h-11 text-sm file:mr-3 file:h-11 file:border-0 file:rounded-md file:bg-[#18372F] file:px-4 file:text-sm file:font-semibold file:text-white" /></label><div className="lg:col-span-3"><Button type="submit" disabled={uploading === 'media'} className="rounded-md cms-green">{uploading === 'media' ? 'Uploading...' : 'Upload to media library'}</Button><p className="mt-2 text-xs text-neutral-500">Drag and drop or choose a file. Upload once, reuse everywhere.</p></div></form></Editor><Editor title="Media Library"><div className="mb-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"><p className="text-sm text-slate-500">Reusable images for projects, blogs and site sections.</p><TextInput value={mediaSearch} onChange={event => setMediaSearch(event.target.value)} placeholder="Search images..." /></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">{items.map(item => <div key={item.id || item.url} className="rounded-lg border cms-border bg-white p-2"><img src={item.url} alt="" className="h-32 w-full rounded-md bg-neutral-100 object-cover" /><div className="mt-2 min-w-0"><b className="block truncate text-sm">{item.name || 'Untitled image'}</b><p className="line-clamp-2 text-xs text-neutral-500">{item.description || item.url}</p><Button tone="danger" className="mt-2 h-8 rounded-md px-3 text-xs" onClick={() => removeMedia(item.id)}>Remove</Button></div></div>)}{!items.length && <p className="col-span-full rounded-lg border border-dashed border-neutral-300 p-6 text-sm text-neutral-500">No media found.</p>}</div></Editor></section>;
+  return <section className="grid gap-5"><Editor title="Upload Images"><form onSubmit={uploadMedia} onDrop={event => { event.preventDefault(); const files = Array.from(event.dataTransfer.files || []); if(files.length) setMediaDraft(current => ({ ...current, files })); }} onDragOver={event => event.preventDefault()} className="grid gap-4 rounded-lg border border-dashed border-slate-300 bg-[#FAFBF8] p-6 lg:grid-cols-[1fr_1fr_auto] lg:items-end"><Field label="Image name (single upload only)"><TextInput value={mediaDraft.name} onChange={event => setMediaDraft(current => ({ ...current, name: event.target.value }))} placeholder="Homepage hero" /></Field><Field label="Description"><TextInput value={mediaDraft.description} onChange={event => setMediaDraft(current => ({ ...current, description: event.target.value }))} placeholder="Where these images are useful" /></Field><label className="grid gap-2 text-xs font-semibold uppercase tracking-wide text-neutral-600"><span>Images</span><input type="file" accept="image/*" multiple onChange={event => setMediaDraft(current => ({ ...current, files: Array.from(event.target.files || []) }))} className="block h-11 text-sm file:mr-3 file:h-11 file:border-0 file:rounded-md file:bg-[#18372F] file:px-4 file:text-sm file:font-semibold file:text-white" /></label><div className="lg:col-span-3"><Button type="submit" disabled={uploading === 'media'} className="rounded-md cms-green">{uploading === 'media' ? 'Uploading...' : 'Upload selected images'}</Button><p className="mt-2 text-xs text-neutral-500">Select or drag multiple files. Each upload is saved to the reusable media library.</p>{mediaDraft.files?.length ? <p className="mt-1 text-xs font-semibold text-[#18372F]">{mediaDraft.files.length} file{mediaDraft.files.length === 1 ? '' : 's'} selected</p> : null}</div></form></Editor><Editor title="Media Library"><div className="mb-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"><p className="text-sm text-slate-500">Reusable images for Works, Office, home and slideshow.</p><TextInput value={mediaSearch} onChange={event => setMediaSearch(event.target.value)} placeholder="Search images..." /></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">{items.map(item => <div key={item.id || item.url} className="rounded-lg border cms-border bg-white p-2"><img src={item.url} alt="" className="h-32 w-full rounded-md bg-neutral-100 object-cover" /><div className="mt-2 min-w-0"><b className="block truncate text-sm">{item.name || 'Untitled image'}</b><p className="line-clamp-2 text-xs text-neutral-500">{item.description || item.url}</p><Button tone="danger" className="mt-2 h-8 rounded-md px-3 text-xs" onClick={() => removeMedia(item)}>Delete</Button></div></div>)}{!items.length && <p className="col-span-full rounded-lg border border-dashed border-neutral-300 p-6 text-sm text-neutral-500">No media found.</p>}</div></Editor></section>;
 }
 
 function SiteContentTab({ content, updateSite, imageOptions }){
@@ -277,7 +334,8 @@ function SiteContentTab({ content, updateSite, imageOptions }){
 
 function ItemList({ title, items, active, onSelect, onAdd, label, sublabel }){
  const [query,setQuery]=useState('');
-  return <aside className="h-max border border-neutral-200 bg-white p-3 shadow-sm lg:sticky lg:top-24"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500">Manage</p><h2 className="text-lg font-semibold">{title}</h2></div><Button className="h-9 px-3 text-xs" onClick={onAdd}>Add</Button></div><input aria-label={`Search ${title}`} placeholder={`Search ${title}…`} value={query} onChange={e=>setQuery(e.target.value)} className="w-full border p-2 mb-2"/><div className="grid max-h-[72vh] gap-1 overflow-auto pr-1">{items.map((item, index) => !label(item).toLowerCase().includes(query.toLowerCase()) ? null : <button key={`${label(item)}-${index}`} onClick={() => onSelect(index)} className={cx('grid grid-cols-[42px_1fr] gap-2 border p-1.5 text-left transition', active === index ? 'border-black bg-neutral-50' : 'border-neutral-200 bg-white hover:border-neutral-400')}><img src={item.image || ''} alt="" className="h-10 w-10 bg-neutral-100 object-cover" /><span className="min-w-0"><b className="block truncate text-xs leading-tight">{label(item) || 'Untitled'}</b><span className="mt-1 block truncate text-[11px] capitalize text-neutral-500">{sublabel(item)}</span></span></button>)}</div></aside>;
+  const matches=items.map((item,index)=>({item,index})).filter(({item})=>`${label(item)} ${sublabel(item)}`.toLowerCase().includes(query.toLowerCase()));
+  return <aside className="h-max border border-neutral-200 bg-white p-3 shadow-sm lg:sticky lg:top-24"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500">Manage</p><h2 className="text-lg font-semibold">{title}</h2></div><Button className="h-9 px-3 text-xs" onClick={onAdd}>Add</Button></div><input aria-label={`Search ${title}`} placeholder={`Search ${title}…`} value={query} onChange={e=>setQuery(e.target.value)} className="mb-2 w-full border p-2"/><div role="table" className="max-h-[72vh] overflow-auto border border-neutral-200"><div role="row" className="grid grid-cols-[38px_1fr_auto] gap-2 border-b border-neutral-200 bg-neutral-50 p-2 text-[10px] font-semibold uppercase tracking-wide text-neutral-500"><span>Image</span><span>Name</span><span>Actions</span></div>{matches.map(({item,index})=><div role="row" key={`${label(item)}-${index}`} className={cx('grid grid-cols-[38px_1fr_auto] items-center gap-2 border-b border-neutral-200 p-2',active===index&&'bg-[#E9EFEB]')}><img src={item.image||''} alt="" className="h-9 w-9 bg-neutral-100 object-cover"/><button type="button" onClick={()=>onSelect(index)} className="min-w-0 text-left"><b className="block truncate text-xs">{label(item)||'Untitled'}</b><span className="block truncate text-[10px] text-neutral-500">{sublabel(item)}</span></button><span className="flex gap-1"><button type="button" aria-label={`View ${label(item)}`} title="View details" onClick={()=>onSelect(index)} className="border px-1.5 py-1 text-xs">ⓘ</button><button type="button" aria-label={`Edit ${label(item)}`} title="Edit" onClick={()=>onSelect(index)} className="border px-1.5 py-1 text-xs">✎</button></span></div>)}{!matches.length&&<p className="p-3 text-sm text-neutral-500">No matching records.</p>}</div></aside>;
 }
 
 function Editor({ title, children }){

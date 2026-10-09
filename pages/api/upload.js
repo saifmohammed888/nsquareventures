@@ -24,8 +24,8 @@ function cleanName(value){
 }
 
 export default async function handler(req, res){
-  if(req.method !== 'POST'){
-    res.setHeader('Allow', 'POST');
+  if(!['POST', 'DELETE'].includes(req.method)){
+    res.setHeader('Allow', 'POST, DELETE');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -38,6 +38,15 @@ export default async function handler(req, res){
   }
 
   try{
+    if(req.method === 'DELETE'){
+      const url = String(req.query.url || '');
+      if(!/^https:\/\/[^/]+\.blob\.vercel-storage\.com\/cms\/images\//.test(url)){
+        return res.status(400).json({ error: 'Only uploaded CMS images can be deleted.' });
+      }
+      const { del } = await import('@vercel/blob');
+      await del(url);
+      return res.status(200).json({ ok: true });
+    }
     const { put } = await import('@vercel/blob');
     const filename = cleanName(req.query.filename);
     const contentType = req.headers['content-type'] || 'application/octet-stream';

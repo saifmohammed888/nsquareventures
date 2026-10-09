@@ -5,7 +5,7 @@ import { Layout, ContactCTA, useContent } from '../components/Public';
 const assetUrl = url => /^(https?:\/\/|\/)/i.test(url || '') ? url : `/${url}`;
 
 function ProjectCard({ project }) {
-  const slides = [project.image, project.secondaryImage]
+  const slides = [project.image, ...(project.secondaryImages || [])]
     .filter(Boolean)
     .filter(image => image === project.image || !/wireframe|signature|architect-|favicon|logo/i.test(image))
     .filter((image, index, list) => list.indexOf(image) === index)
