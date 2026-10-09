@@ -16,7 +16,15 @@ export default async function handler(req, res){
       const content = migrate(storedContent || defaultContent());
       return res.status(200).json(authorized(req) ? content : publicContent(content));
     }catch(error){
-      return res.status(503).json({error:'Content is temporarily unavailable.'});
+      // The public site should remain available if an optional content store
+      // (for example, a database connection) is temporarily unavailable.
+      // Default content is bundled with the application and is safe to serve.
+      try{
+        const content = migrate(defaultContent());
+        return res.status(200).json(authorized(req) ? content : publicContent(content));
+      }catch(fallbackError){
+        return res.status(503).json({error:'Content is temporarily unavailable.'});
+      }
     }
   }
 
