@@ -66,7 +66,7 @@ export default function Admin(){
     return [...library, ...imageOptions.filter(item => !known.has(item.url))];
   }, [content.media, imageOptions]);
   const stats = useMemo(() => [['Works', content.projects.length], ['Ongoing', content.projects.filter(project => project.status !== 'completed').length], ['Completed', content.projects.filter(project => project.status === 'completed').length], ['Media', (content.media || []).length], ['Site images', Object.values(content.site || {}).filter(Boolean).length]], [content]);
-  const pageTitle = tab === 'website' ? 'Website' : tab === 'projects' ? 'Works' : tab === 'presentation' ? 'Slideshow Manager' : tab === 'images' ? 'Media / Images' : tab === 'site' ? 'Site Content' : 'Advanced Settings';
+  const pageTitle = tab === 'content' ? 'Content Manager' : tab === 'website' ? 'Website' : tab === 'projects' ? 'Works' : tab === 'presentation' ? 'Slideshow Manager' : tab === 'images' ? 'Media / Images' : 'Advanced Settings';
 
   useEffect(() => {
     const saved = sessionStorage.getItem('nsquare_cms_password') || '';
@@ -261,7 +261,7 @@ export default function Admin(){
       <main className="min-h-screen bg-[#F7F8F5] text-[#102A24]">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r cms-border bg-[#FBFCF9] p-5 lg:flex lg:flex-col">
           <div><p className="font-serif text-lg tracking-[0.18em] cms-text">N SQUARE VENTURES</p><p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">CMS</p></div>
-          <nav className="mt-10 grid gap-1">{[['website','Website',null],['projects','Works',content.projects.length],['presentation','Slideshow Manager',null],['images','Media / Images',(content.media || []).length],['raw','Advanced / Settings',null]].map(([key,label,count]) => <button key={key} onClick={() => setTab(key)} className={cx('flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold transition', tab === key ? 'bg-[#E9EFEB] cms-text' : 'text-slate-700 hover:bg-white')}><span>{label}</span>{count != null && <span className="rounded-full bg-[#E9EFEB] px-2 py-0.5 text-xs cms-text">{count}</span>}</button>)}</nav>
+          <nav className="mt-10 grid gap-1">{[['content','Content Manager',null],['website','Website',null],['projects','Works',content.projects.length],['presentation','Slideshow Manager',null],['images','Media / Images',(content.media || []).length],['raw','Advanced / Settings',null]].map(([key,label,count]) => <button key={key} onClick={() => setTab(key)} className={cx('flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold transition', tab === key ? 'bg-[#E9EFEB] cms-text' : 'text-slate-700 hover:bg-white')}><span>{label}</span>{count != null && <span className="rounded-full bg-[#E9EFEB] px-2 py-0.5 text-xs cms-text">{count}</span>}</button>)}</nav>
           <div className="mt-auto grid gap-3"><a href="/" target="_blank" className="text-sm font-semibold cms-text">View Site ↗</a><div className="flex items-center gap-3 border-t cms-border pt-5"><div className="grid h-10 w-10 place-items-center rounded-full cms-green text-sm font-semibold text-white">NU</div><div><b className="block text-sm">Nsquare CMS</b><span className="text-xs text-slate-500">Administrator</span></div></div></div>
         </aside>
         <section className="lg:pl-64">
@@ -274,8 +274,9 @@ export default function Admin(){
 
         <div className="grid gap-5 px-5 py-6">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{stats.map(([label, value]) => <div key={label} className="rounded-lg border cms-border bg-white p-4"><span className="text-xs text-slate-500">{label}</span><b className="mt-1 block text-2xl cms-text">{value}</b></div>)}</div>
-          <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="website">Website</option><option value="projects">Works</option><option value="presentation">Slideshow Manager</option><option value="images">Media / Images</option><option value="raw">Advanced / Settings</option></select></div>
+          <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="content">Content Manager</option><option value="website">Website</option><option value="projects">Works</option><option value="presentation">Slideshow Manager</option><option value="images">Media / Images</option><option value="raw">Advanced / Settings</option></select></div>
 
+          {tab === 'content' && <WebsiteEditor content={content} onChange={next=>setContent(sync(next))} images={mediaOptions} initialSection="Home"/>}
           {tab === 'website' && <WebsiteEditor content={content} onChange={next=>setContent(sync(next))} images={mediaOptions}/>}
           {tab === 'presentation' && <WebsiteEditor content={content} onChange={next=>setContent(sync(next))} images={mediaOptions} initialSection="Presentation"/>}
           {tab === 'projects' && <ProjectsTab imageOptions={mediaOptions} content={content} setContent={setContent} project={project} projectIndex={projectIndex} setProjectIndex={setProjectIndex} updateProject={updateProject} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} />}
