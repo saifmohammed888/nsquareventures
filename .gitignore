@@ -4,3 +4,6 @@ out
 cms-content.local.json
 .env*.local
 .DS_Store
+.content-backups
+cms-content.local.json.tmp
+test-results

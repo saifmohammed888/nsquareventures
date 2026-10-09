@@ -1,16 +1,17 @@
 import Head from 'next/head';
+import HomeContent from '../components/HomeContent';
 import Script from 'next/script';
 
 export default function Page(){
   return (
     <>
       <Head>
-        <title>Nsquare Ventures — Architecture-led design and delivery</title>
+        <title>Nsquare Ventures — Architecture, interiors and construction</title>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <style>{`
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600&display=swap');
-:root{--paper:#f8f7f2;--ink:#17352f;--text:#44514c;--muted:#738078;--line:#d9ddd7;--sage:#718078;--sage2:#5f7068;--white:#fff;--g:clamp(44px,calc(5vw + 20px),112px);--serif:"Cormorant Garamond",Georgia,serif;--sans:Inter,Arial,sans-serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(120deg,#fbfaf6,#f3f1eb);color:var(--ink);font-family:var(--sans);font-size:14px}.shell{width:100%;background:var(--paper)}a{color:inherit;text-decoration:none}button{font:inherit}img{display:block;width:100%}
+:root{--paper:#fff;--ink:#17352f;--text:#44514c;--muted:#738078;--line:#d9ddd7;--sage:#718078;--sage2:#5f7068;--white:#fff;--g:clamp(44px,calc(5vw + 20px),112px);--serif:"Cormorant Garamond",Georgia,serif;--sans:Inter,Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--ink);font-family:var(--sans);font-size:14px}.shell{width:100%;background:var(--paper)}a{color:inherit;text-decoration:none}button{font:inherit}img{display:block;width:100%}
 .header{height:78px;display:grid;grid-template-columns:260px 1fr auto;align-items:center;padding:0 var(--g);border-bottom:1px solid var(--line);position:relative;z-index:10;background:rgba(248,247,242,.95)}
 .brand{display:flex;align-items:center;gap:13px;letter-spacing:.16em;font-family:var(--serif);font-size:21px}.mark{width:39px;height:39px;border:1px solid var(--ink);display:grid;place-items:center;font:500 23px var(--serif)}.brand small{display:block;font:500 10px var(--sans);letter-spacing:.28em;margin-top:1px}
 .nav{display:flex;justify-content:center;gap:32px;font-size:12px}.nav a{position:relative}.nav a:after{content:"";position:absolute;left:0;right:100%;bottom:-7px;height:1px;background:var(--ink);transition:.25s}.nav a:hover:after{right:0}
@@ -63,7 +64,7 @@ export default function Page(){
 .project-meta span{display:grid;grid-template-columns:64px 1fr;gap:10px}
 .project-meta b{font-weight:600;color:var(--ink)}
 .stats{grid-template-columns:190px 190px 190px 1fr}
-.process{padding:72px var(--g) 64px;background:#fbfaf6;border-top:1px solid var(--line);position:relative;overflow:hidden}
+.process{padding:72px var(--g) 64px;background:#fff;border-top:1px solid var(--line);position:relative;overflow:hidden}
 .process-head{display:grid;grid-template-columns:.85fr 1fr;gap:clamp(30px,7vw,120px);align-items:start;margin-bottom:52px}
 .process h2{font:500 clamp(48px,4.8vw,78px)/.92 var(--serif);letter-spacing:-.025em;margin:14px 0 0}
 .process-copy{font-size:15px;line-height:1.6;color:var(--text);max-width:430px}
@@ -78,7 +79,7 @@ export default function Page(){
 .process-visual img{height:220px;object-fit:cover}
 .process-foot{display:grid;grid-template-columns:260px 1fr;gap:42px;margin-top:18px;font-size:12px;line-height:1.65;color:var(--text)}
 .process-foot .eyebrow{color:var(--ink)}
-.process{background:linear-gradient(120deg,#fbfaf6,#f3f1eb)}
+.process{background:#fff}
 .process-visual{grid-template-columns:1fr 1fr;align-items:stretch;margin-top:34px;min-height:260px}
 .process-visual .drawing-panel{min-height:260px;border-bottom:0;position:relative;background-color:rgba(255,255,255,.32);background-image:linear-gradient(rgba(23,53,47,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(23,53,47,.08) 1px,transparent 1px)}
 .process-visual .drawing-panel:before{content:"";position:absolute;inset:22px 0 18px 0;background:var(--cms-home-process-sketch, url("Images/wireframe.jpg")) center/contain no-repeat;opacity:.68;filter:saturate(.15) contrast(1.05)}
@@ -144,15 +145,45 @@ export default function Page(){
 @media(max-width:430px){:root{--g:22px}.brand{gap:10px;font-size:16px}.mark{width:32px;height:32px;font-size:20px}.hero-copy{padding-top:34px}.lead{font-size:14px}.actions a{width:100%}.visual,.visual img{min-height:390px}.visual-meta{font-size:11px}.project-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.project-tabs span{text-align:center;padding:8px 6px}.card-image{height:238px;min-height:238px}.project-meta span{grid-template-columns:54px 1fr}.process-step{padding-right:0}.journal-intro{font-size:15px;gap:20px}.footer{padding-top:44px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 `}</style>
+        <style>{`
+/* Project-first editorial direction */
+body{background:#f7f7f4;color:#161b19}
+.hero{min-height:500px;height:clamp(500px,62vw,680px);grid-template-columns:minmax(320px,.72fr) 1.28fr;border-bottom:1px solid #dfe2dd}
+.hero-copy{padding-top:38px;padding-bottom:38px;justify-content:flex-end}
+.hero-copy h1{font-size:clamp(58px,7.8vw,118px);line-height:.84;max-width:620px;margin:28px 0 22px;letter-spacing:-.055em}
+.hero-copy .lead{max-width:400px;font-size:13px;line-height:1.55}
+.hero-copy .actions{margin-top:22px}
+.hero-note{display:none}
+.visual{min-height:0;background:#e8ebe7}
+.visual img{filter:grayscale(.18) saturate(.68) contrast(.98)}
+.visual:after{background:linear-gradient(90deg,rgba(247,247,244,.12),transparent 30%)}
+.visual-meta{font-size:10px;letter-spacing:.25em;top:28px;right:30px}
+.projects{padding:clamp(56px,8vw,112px) var(--g) 80px;background:#f7f7f4}
+.projects-head{grid-template-columns:1fr auto;align-items:end;margin-bottom:34px}
+.projects h2{font-size:clamp(52px,6.6vw,100px);line-height:.83;max-width:700px;color:#161b19}
+.projects-intro{display:flex;align-items:end;justify-items:end;padding:0 0 7px}
+.projects-intro a{font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid #161b19;padding-bottom:9px}
+.project-grid{grid-template-columns:repeat(3,1fr);gap:18px}
+.card{min-height:clamp(300px,34vw,475px);background:#e4e7e1}
+.card-image{height:clamp(220px,28vw,375px);min-height:0}
+.card-info{padding:18px 16px 20px}
+.card h3{font-size:27px;letter-spacing:-.02em}
+.card p{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.card .arrow{top:calc(clamp(220px,28vw,375px) - 40px);right:14px}
+.consultants{display:none}
+.footer{margin-top:0}
+@media(max-width:900px){.hero{grid-template-columns:1fr;height:auto}.hero-copy{min-height:470px}.visual{min-height:520px}.projects-head{grid-template-columns:1fr;gap:18px}.projects-intro{justify-content:flex-start}.project-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.hero-copy{min-height:460px}.visual{min-height:400px}.projects{padding-top:56px}.project-grid{grid-template-columns:1fr}.card{min-height:330px}.card-image{height:250px}.card .arrow{top:210px}}
+`}</style>
         <link rel="stylesheet" href="/shared-system.css" />
       </Head>
       <div dangerouslySetInnerHTML={{ __html: `
 <div class="shell">
 <header class="header">
-  <a class="brand" href="#"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a>
-  <nav class="nav" aria-label="Primary"><a class="active" href="/">Home</a><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/gallery">Gallery</a><a href="/contact">Contact</a></nav>
+  <a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a>
+  <nav class="nav" aria-label="Primary"><a href="/works">Works</a><a href="/office">Office</a><a href="/contact">Contact</a></nav>
   <!-- <div class="head-actions"><button class="menu-btn" id="menuOpen" aria-label="Open menu">Menu &nbsp; ↗</button></div> -->
-  <div class="head-actions"><a class="inquire" href="/contact">Inquire <span>→</span></a><button class="menu-dot site-menu-trigger" type="button" aria-label="Open navigation">≡</button></div>
+  <div class="head-actions"><button class="menu-dot site-menu-trigger" type="button" aria-label="Open navigation">≡</button></div>
 </header>
 
 <main>
@@ -160,63 +191,23 @@ export default function Page(){
  <div class="hero-copy">
 	   <div class="eyebrow">Architecture · Interiors · Construction</div>
    <h1>Architecture,<br>thoughtfully<br>carried through.</h1>
-   <p class="lead">Nsquare Ventures is an architecture-led design and delivery practice in Bengaluru, bringing architecture, interiors, approvals and construction into one coordinated process.</p>
-	   <div class="actions"><a class="primary" href="/projects">Explore Projects <span class="arrow">→</span></a><a class="secondary" href="/contact">Inquire <span>→</span></a></div>
+   <p class="lead" id="homeIntroduction"></p>
+	   <div class="actions"><a class="primary" href="/works">Explore Works <span class="arrow">→</span></a><a class="secondary" href="/contact">Inquire <span>→</span></a></div>
    <div class="hero-note">Architecture-led. Execution-aware.<br>From first sketch to site execution.</div>
  </div>
- <div class="visual">
-	   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeHeroImage" data-fallback-src="Images/Praveen Villa - Indiranagar.png" alt="Ravine Villa residential architecture">
-   <div class="drawing"><svg viewBox="0 0 900 650" preserveAspectRatio="none"><path d="M0 510 L210 325 L365 405 L555 180 L900 260 M45 585 L45 90 M240 620 L240 40 M470 620 L470 80 M680 620 L680 20 M0 500 H900 M0 390 H900 M0 280 H900 M0 170 H900"/></svg></div>
-   <div class="visual-meta">Spaces<br>people<br>belong in</div>
-   <div class="location">Bengaluru · Karnataka</div>
- </div>
+ <div class="visual" id="homeCarousel"></div>
 </section>
 
 <section class="projects" id="projects">
 	 <div class="projects-head">
-	  <div><div class="eyebrow">Projects</div><h2>Designed from<br>concept to completion.</h2></div>
-		  <div class="projects-intro"><a href="/projects">View All Projects &nbsp; →</a><div class="project-tabs">
+	  <div><div class="eyebrow">Works</div><h2>Designed from<br>concept to completion.</h2></div>
+		  <div class="projects-intro"><a href="/works">View All Works &nbsp; →</a><div class="project-tabs">
 			<!-- <span>All</span> -->
 			<!-- <span>Ongoing</span><span>Completed</span> -->
 		</div></div>
 	 </div>
 	 <div class="project-grid" data-cms-projects></div>
 	 <!-- <div class="stats"><div class="stat"><strong>01</strong><span>Architecture-led</span></div><div class="stat"><strong>02</strong><span>Execution-aware</span></div><div class="stat"><strong>03</strong><span>Coordinated delivery</span></div><div class="signature">ARCHITECTURE · INTERIORS · CONSTRUCTION</div></div> -->
-	</section>
-	<section class="consultants" id="consultants">
-	 <div class="consultants-head">
-	  <div><div class="consultants-label">Our Consultants</div><h2>The people shaping each decision.</h2><div class="consultants-kicker">A trusted ecosystem of experts</div></div>
-	  <p class="consultants-copy">.</p>
-	  <div class="consultants-brand"><strong>N SQUARE VENTURES</strong><span>Architecture | Interiors | Construction</span></div>
-	 </div>
-	 <div class="consultants-body">
-	  <article class="consultant-founder"><div><div class="consultant-icon">NU</div><div class="consultant-role">Founder</div><h3>Mohammed Nadeem Uzamah</h3><p>Leading design direction, client coordination and delivery vision.</p></div><div class="consultant-founder-foot"><span class="consultant-role">Principal Architect</span><span class="consultant-arrow">→</span></div></article>
-	  <div class="consultants-grid">
-	   <article class="consultant-card"><div><div class="consultant-icon">AR</div><div class="consultant-role">Project Architect</div><h3>Mohammed Nabeel</h3><p>Architecture planning, drawings and design coordination.</p></div><span class="consultant-arrow">→</span></article>
-	   <article class="consultant-card"><div><div class="consultant-icon">SE</div><div class="consultant-role">Structural Engineers</div><h3>Pralabhi Associates</h3><p>Structural design inputs and technical coordination.</p></div><span class="consultant-arrow">→</span></article>
-	   <article class="consultant-card"><div><div class="consultant-icon">PL</div><div class="consultant-role">Pool Consultant</div><h3>Millennium Pools</h3><p>Swimming pool systems, specifications and execution guidance.</p></div><span class="consultant-arrow">→</span></article>
-	   <article class="consultant-card"><div><div class="consultant-icon">CA</div><div class="consultant-role">Chartered Accountants</div><h3>Puttaswamy &amp; Company</h3><p>Accounting, taxation and financial compliance support.</p></div><span class="consultant-arrow">→</span></article>
-	   <article class="consultant-card"><div><div class="consultant-icon">FB</div><div class="consultant-role">Finance &amp; Banking</div><h3>Urban Money Corporate DSA</h3><p>Construction finance and banking consultation.</p></div><span class="consultant-arrow">→</span></article>
-	   <article class="consultant-card"><div><div class="consultant-icon">LA</div><div class="consultant-role">Legal Advisor</div><h3>Mir Zia Ulla</h3><p>Advocate &amp; Notary of India.</p></div><span class="consultant-arrow">→</span></article>
-	   <article class="consultant-card"><div><div class="consultant-icon">MS</div><div class="consultant-role">Mentor &amp; Strategic Advisor</div><h3>Mr. N.M. Panali</h3><p>IAS (Retd.)</p></div><span class="consultant-arrow">→</span></article>
-	  </div>
-	 </div>
-	 <div class="consultants-bottom"><div class="consultants-foot">Stronger outcomes<br>through trusted collaborations.</div><a class="consultants-cta" href="/contact">Work with our ecosystem <span>→</span></a></div>
-	</section>
-	<section class="process" id="process">
-	 <div class="process-head">
-	  <div><div class="eyebrow">Process</div><h2>Concept to<br>completion.</h2></div>
-	  <p class="process-copy">A transparent, collaborative and execution-aware process from first conversation to final handover.</p>
-	 </div>
-	 <div class="process-steps">
-	  <div class="process-step"><strong>01</strong><b>Understand</b><span>Site, brief, requirements, feasibility and budget clarity.</span></div>
-	  <div class="process-step"><strong>02</strong><b>Design</b><span>Planning, architecture, interiors, elevations and materials.</span></div>
-	  <div class="process-step"><strong>03</strong><b>Coordinate</b><span>Approvals, structural inputs, MEP and consultants.</span></div>
-	  <div class="process-step"><strong>04</strong><b>Execute</b><span>Construction, detailing, procurement and site decisions.</span></div>
-	  <div class="process-step"><strong>05</strong><b>Deliver</b><span>Finishing, interiors, handover and post-completion support.</span></div>
-	 </div>
-	 <div class="process-visual"><div class="drawing-panel"></div><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="homeProcessImage" data-fallback-src="Images/Elevation/Dr.Sudha-7.png" alt="Nsquare process project"></div>
-	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
 	</section>
 	<!-- <section class="journal" id="journal">
 	 <div class="journal-head">
@@ -229,11 +220,29 @@ export default function Page(){
 	  <a class="post" href="#"><img src="Images/Sayeed Apartment - Yaseen Nagar.png" alt="Reading a Bengaluru site"><div class="post-meta"><b>02 Jan 2026</b><span>↗</span></div><h3>Reading a Bengaluru Site</h3><span>Site Notes</span></a>
 	 </div>
 	</section> -->
-	<footer class="footer site-footer" id="footer">
+	<section class="process" id="process">
+	 <div class="process-head">
+	  <div><div class="eyebrow">Process</div><h2>Concept to<br>completion.</h2></div>
+	  <p class="process-copy">A transparent, collaborative and execution-aware process from first conversation to final handover.</p>
+	 </div>
+	 <div class="process-steps">
+	  <div class="process-step"><strong>01</strong><b>Understand</b><span>Site, brief, requirements, feasibility and budget clarity.</span></div>
+	  <div class="process-step"><strong>02</strong><b>Design</b><span>Planning, architecture, interiors, elevations and materials.</span></div>
+	  <div class="process-step"><strong>03</strong><b>Coordinate</b><span>Approvals, structural inputs, MEP and consultants.</span></div>
+	  <div class="process-step"><strong>04</strong><b>Execute</b><span>Construction, detailing, procurement and site decisions.</span></div>
+	  <div class="process-step"><strong>05</strong><b>Deliver</b><span>Finishing, interiors, handover and post-completion support.</span></div>
+	 </div>
+	 <div class="process-visual">
+	  <div class="drawing-panel" aria-label="Architectural drawing"></div>
+	  <img src="Images/Sayeed Apartment - Yaseen Nagar.png" alt="Completed N Square Ventures project">
+	 </div>
+	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
+	</section>
+	<div id="homeContact"></div><footer class="footer site-footer" id="footer">
 	 <div class="footer-main site-footer-grid">
-	  <div class="site-footer-brand"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><p>Architecture-led design and delivery<br>in Bengaluru.</p></div>
-	  <nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/gallery">Gallery</a><a href="/contact">Contact</a></nav>
-	  <div class="site-footer-col"><h2>Practice</h2><a href="/expertise">Architecture</a><a href="/expertise">Interiors</a><a href="/expertise">Construction</a><a href="/expertise#elevation">Approvals &amp; Coordination</a><a href="/expertise#elevation">Elevation Consultation</a></div>
+	  <div class="site-footer-brand"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><p>Architecture, interiors and construction<br>in Bengaluru.</p></div>
+	  <nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/works">Works</a><a href="/office">Office</a><a href="/contact">Contact</a></nav>
+	  <div class="site-footer-col"><h2>Practice</h2><a href="/office">Architecture</a><a href="/office">Interiors</a><a href="/office">Construction</a></div>
 	  <div class="footer-contact site-footer-location"><h2>Based In</h2><strong>Bengaluru<br>Karnataka<br>India</strong><a href="/contact">Start a conversation <span>→</span></a></div>
 	 </div>
 	</footer>
@@ -244,23 +253,16 @@ export default function Page(){
 <aside class="side site-side" id="side" aria-hidden="true">
  <div class="side-top site-side-top"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><button class="close site-close" id="menuClose" type="button">Close &nbsp; ×</button></div>
  <div class="side-label site-side-label">Menu</div>
- <nav class="side-nav site-side-nav"><a href="/">Home <span>01</span></a><a href="/projects">Projects <span>02</span></a><a href="/expertise">Expertise <span>03</span></a><a href="/journal">Journal <span>04</span></a><a href="/gallery">Gallery <span>05</span></a><a href="/contact">Contact <span>06</span></a></nav>
+ <nav class="site-side-nav"><a href="/works">Works <span>01</span></a><a href="/office">Office <span>02</span></a><a href="/contact">Contact <span>03</span></a></nav>
  <div class="side-art"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="navigationMenuImage" data-fallback-src="Images/wireframe.jpg" alt=""><div class="side-words">Spaces<br>for a<br>better<br>tomorrow</div></div>
  <div class="side-foot site-side-foot"><div>Instagram<br>LinkedIn<br>YouTube</div><div class="cross site-cross" aria-hidden="true"></div></div>
 </aside>
 
 
 ` }} />
+      <HomeContent />
       <Script src="/shared-system.js" strategy="afterInteractive" />
-      <Script id="inline-index-1" strategy="afterInteractive">{`
-const side=document.getElementById('side'),scrim=document.getElementById('scrim');
-function toggle(open){side.classList.toggle('open',open);scrim.classList.toggle('open',open);side.setAttribute('aria-hidden',String(!open));document.body.style.overflow=open?'hidden':''}
-const menuOpen=document.getElementById('menuOpen'); if(menuOpen) menuOpen.addEventListener('click',()=>toggle(true));
-const menuClose=document.getElementById('menuClose'); if(menuClose) menuClose.addEventListener('click',()=>toggle(false));
-scrim.addEventListener('click',()=>toggle(false));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')toggle(false)});
-side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>toggle(false)));
-`}</Script>
+
     </>
   );
 }

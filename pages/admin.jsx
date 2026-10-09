@@ -1,8 +1,9 @@
+import WebsiteEditor, {ProjectFields,ImagePicker} from '../components/WebsiteEditor';
 import Head from 'next/head';
 import Script from 'next/script';
 import { useEffect, useMemo, useState } from 'react';
 
-const emptyProject = { slug: 'new-project', name: 'New Project', status: 'ongoing', type: 'residential', location: '', area: '', client: '', image: '', secondaryImage: '', summary: '', details: '', scope: [] };
+const emptyProject = { slug: 'new-project', name: 'New Project', status: 'ongoing', published: false, tagIds: [], type: '', location: '', area: '', client: '', image: '', secondaryImage: '', summary: '', details: '', scope: [] };
 const emptyArticle = { slug: 'new-blog', title: 'New Blog', category: 'Journal', categories: 'insights', image: '', secondaryImage: '', alt: '', summary: '', takeaways: [], body: [] };
 const siteImageFields = [
   ['homeHeroImage', 'Home / Hero image', 'Main image on the home page hero.'],
@@ -64,7 +65,7 @@ export default function Admin(){
     return [...library, ...imageOptions.filter(item => !known.has(item.url))];
   }, [content.media, imageOptions]);
   const stats = useMemo(() => [['Projects', content.projects.length], ['Ongoing', content.projects.filter(project => project.status !== 'completed').length], ['Completed', content.projects.filter(project => project.status === 'completed').length], ['Blogs', content.articles.length], ['Media', (content.media || []).length], ['Site images', Object.values(content.site || {}).filter(Boolean).length]], [content]);
-  const pageTitle = tab === 'projects' ? 'Projects' : tab === 'blogs' ? 'Blogs' : tab === 'images' ? 'Media / Images' : tab === 'site' ? 'Site Content' : 'Advanced Settings';
+  const pageTitle = tab === 'website' ? 'Website' : tab === 'projects' ? 'Projects' : tab === 'blogs' ? 'Blogs' : tab === 'images' ? 'Media / Images' : tab === 'site' ? 'Site Content' : 'Advanced Settings';
 
   useEffect(() => {
     const saved = sessionStorage.getItem('nsquare_cms_password') || '';
@@ -92,7 +93,7 @@ export default function Admin(){
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || 'Unable to load content.');
     const images = await loadImages();
-    const next = sync(mergeUploadedImages({ projects: data.projects || [], articles: data.articles || [], media: data.media || [], site: data.site || {} }, images));
+    const next = sync(mergeUploadedImages({ ...data, projects: data.projects || [], articles: data.articles || [], media: data.media || [], site: data.site || {} }, images));
     setContent(next);
     setProjectIndex(0);
     setArticleIndex(0);
@@ -129,7 +130,7 @@ export default function Admin(){
     const response = await fetch('/api/content', { method: 'POST', headers: authHeaders({ 'content-type': 'application/json' }), body: JSON.stringify(body) });
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || 'Unable to save content.');
-    return sync({ projects: data.content.projects || [], articles: data.content.articles || [], media: data.content.media || [], site: data.content.site || {} });
+    return sync(data.content);
   }
 
   function logout(){ sessionStorage.removeItem('nsquare_cms_password'); setAuthed(false); setPassword(''); setStatus('Locked.'); }
@@ -225,7 +226,7 @@ export default function Admin(){
       <main className="min-h-screen bg-[#F7F8F5] text-[#102A24]">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r cms-border bg-[#FBFCF9] p-5 lg:flex lg:flex-col">
           <div><p className="font-serif text-lg tracking-[0.18em] cms-text">N SQUARE VENTURES</p><p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">CMS</p></div>
-          <nav className="mt-10 grid gap-1">{[['projects','Projects',content.projects.length],['blogs','Blogs',content.articles.length],['images','Media / Images',(content.media || []).length],['site','Site Content',Object.values(content.site || {}).filter(Boolean).length],['raw','Advanced / Settings',null]].map(([key,label,count]) => <button key={key} onClick={() => setTab(key)} className={cx('flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold transition', tab === key ? 'bg-[#E9EFEB] cms-text' : 'text-slate-700 hover:bg-white')}><span>{label}</span>{count != null && <span className="rounded-full bg-[#E9EFEB] px-2 py-0.5 text-xs cms-text">{count}</span>}</button>)}</nav>
+          <nav className="mt-10 grid gap-1">{[['website','Website',null],['projects','Works',content.projects.length],['blogs','Blogs',content.articles.length],['images','Media / Images',(content.media || []).length],['site','Site Content',Object.values(content.site || {}).filter(Boolean).length],['raw','Advanced / Settings',null]].map(([key,label,count]) => <button key={key} onClick={() => setTab(key)} className={cx('flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold transition', tab === key ? 'bg-[#E9EFEB] cms-text' : 'text-slate-700 hover:bg-white')}><span>{label}</span>{count != null && <span className="rounded-full bg-[#E9EFEB] px-2 py-0.5 text-xs cms-text">{count}</span>}</button>)}</nav>
           <div className="mt-auto grid gap-3"><a href="/" target="_blank" className="text-sm font-semibold cms-text">View Site ↗</a><div className="flex items-center gap-3 border-t cms-border pt-5"><div className="grid h-10 w-10 place-items-center rounded-full cms-green text-sm font-semibold text-white">NU</div><div><b className="block text-sm">Nsquare CMS</b><span className="text-xs text-slate-500">Administrator</span></div></div></div>
         </aside>
         <section className="lg:pl-64">
@@ -238,8 +239,9 @@ export default function Admin(){
 
         <div className="grid gap-5 px-5 py-6">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{stats.map(([label, value]) => <div key={label} className="rounded-lg border cms-border bg-white p-4"><span className="text-xs text-slate-500">{label}</span><b className="mt-1 block text-2xl cms-text">{value}</b></div>)}</div>
-          <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="projects">Projects</option><option value="blogs">Blogs</option><option value="images">Media / Images</option><option value="site">Site Content</option><option value="raw">Advanced / Settings</option></select></div>
+          <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="website">Website</option><option value="projects">Works</option><option value="blogs">Blogs</option><option value="images">Media / Images</option><option value="site">Site Content</option><option value="raw">Advanced / Settings</option></select></div>
 
+          {tab === 'website' && <WebsiteEditor content={content} onChange={next=>setContent(sync(next))} images={mediaOptions}/>}
           {tab === 'projects' && <ProjectsTab imageOptions={mediaOptions} content={content} setContent={setContent} project={project} projectIndex={projectIndex} setProjectIndex={setProjectIndex} updateProject={updateProject} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} />}
           {tab === 'blogs' && <BlogsTab imageOptions={mediaOptions} content={content} setContent={setContent} article={article} articleIndex={articleIndex} setArticleIndex={setArticleIndex} updateArticle={updateArticle} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} />}
           {tab === 'images' && <ImagesTab imageOptions={mediaOptions} content={content} setContent={setContent} uploading={uploading} mediaDraft={mediaDraft} setMediaDraft={setMediaDraft} uploadMedia={uploadMedia} sync={sync} mediaSearch={mediaSearch} setMediaSearch={setMediaSearch} />}
@@ -253,7 +255,7 @@ export default function Admin(){
 }
 
 function ProjectsTab({ content, setContent, project, projectIndex, setProjectIndex, updateProject, updateList, addListItem, removeListItem, sync, imageOptions }){
-  return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Projects" items={content.projects} active={projectIndex} onSelect={setProjectIndex} onAdd={() => { setContent(current => sync({ ...current, projects: [...current.projects, { ...emptyProject }] })); setProjectIndex(content.projects.length); }} label={item => item.name} sublabel={item => `${item.status || 'draft'} · ${item.location || 'No location'}`} />{project && <Editor title={project.name || 'Project'}><Preview image={project.image} title={project.name} text={project.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Project name"><TextInput value={project.name || ''} onChange={event => updateProject('name', event.target.value)} /></Field><Field label="Slug"><TextInput value={project.slug || ''} onChange={event => updateProject('slug', event.target.value)} /></Field><ProjectStatusControl value={project.status || 'ongoing'} onChange={value => updateProject('status', value)} /><Field label="Type filters"><TextInput value={project.type || ''} onChange={event => updateProject('type', event.target.value)} placeholder="villa residential" /></Field><Field label="Location"><TextInput value={project.location || ''} onChange={event => updateProject('location', event.target.value)} /></Field><Field label="Area"><TextInput value={project.area || ''} onChange={event => updateProject('area', event.target.value)} /></Field><Field label="Client / owner"><TextInput value={project.client || ''} onChange={event => updateProject('client', event.target.value)} /></Field></div><div className="grid gap-4 md:grid-cols-2"><ImageField label="Main image" value={project.image || ''} onChange={value => updateProject('image', value)} imageOptions={imageOptions} /><ImageField label="Second image" value={project.secondaryImage || ''} onChange={value => updateProject('secondaryImage', value)} imageOptions={imageOptions} /></div><Field label="Short card summary"><TextArea rows={3} value={project.summary || ''} onChange={event => updateProject('summary', event.target.value)} /></Field><Field label="Project detail text"><TextArea rows={5} value={project.details || ''} onChange={event => updateProject('details', event.target.value)} /></Field><Repeat title="Scope" items={project.scope || []} kind="scope" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><Button tone="danger" onClick={() => { if(confirm('Delete this project?')) setContent(current => sync({ ...current, projects: current.projects.filter((_, i) => i !== projectIndex) })); }}>Delete project</Button></Editor>}</section>;
+  return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Projects" items={content.projects} active={projectIndex} onSelect={setProjectIndex} onAdd={() => { setContent(current => sync({ ...current, projects: [...current.projects, { ...emptyProject }] })); setProjectIndex(content.projects.length); }} label={item => item.name} sublabel={item => `${item.status || 'draft'} · ${item.location || 'No location'}`} />{project && <Editor title={project.name || 'Project'}><ProjectFields project={project} tags={content.tags} onChange={updateProject}/><Preview image={project.image} title={project.name} text={project.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Project name"><TextInput value={project.name || ''} onChange={event => updateProject('name', event.target.value)} /></Field><Field label="Slug"><TextInput value={project.slug || ''} onChange={event => updateProject('slug', event.target.value)} /></Field><ProjectStatusControl value={project.status || 'ongoing'} onChange={value => updateProject('status', value)} /><Field label="Location"><TextInput value={project.location || ''} onChange={event => updateProject('location', event.target.value)} /></Field><Field label="Area"><TextInput value={project.area || ''} onChange={event => updateProject('area', event.target.value)} /></Field><Field label="Client / owner"><TextInput value={project.client || ''} onChange={event => updateProject('client', event.target.value)} /></Field></div><div className="grid gap-4 md:grid-cols-2"><ImageField label="Main image" value={project.image || ''} onChange={value => updateProject('image', value)} imageOptions={imageOptions} /><ImageField label="Second image" value={project.secondaryImage || ''} onChange={value => updateProject('secondaryImage', value)} imageOptions={imageOptions} /></div><Field label="Short card summary"><TextArea rows={3} value={project.summary || ''} onChange={event => updateProject('summary', event.target.value)} /></Field><Field label="Project detail text"><TextArea rows={5} value={project.details || ''} onChange={event => updateProject('details', event.target.value)} /></Field><Repeat title="Scope" items={project.scope || []} kind="scope" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><Button tone="danger" onClick={() => { if(confirm('Delete this project?')) setContent(current => sync({ ...current, projects: current.projects.filter((_, i) => i !== projectIndex) })); }}>Delete project</Button></Editor>}</section>;
 }
 
 function BlogsTab({ content, setContent, article, articleIndex, setArticleIndex, updateArticle, updateList, addListItem, removeListItem, sync, imageOptions }){
@@ -274,7 +276,8 @@ function SiteContentTab({ content, updateSite, imageOptions }){
 }
 
 function ItemList({ title, items, active, onSelect, onAdd, label, sublabel }){
-  return <aside className="h-max border border-neutral-200 bg-white p-3 shadow-sm lg:sticky lg:top-24"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500">Manage</p><h2 className="text-lg font-semibold">{title}</h2></div><Button className="h-9 px-3 text-xs" onClick={onAdd}>Add</Button></div><div className="grid max-h-[72vh] gap-1 overflow-auto pr-1">{items.map((item, index) => <button key={`${label(item)}-${index}`} onClick={() => onSelect(index)} className={cx('grid grid-cols-[42px_1fr] gap-2 border p-1.5 text-left transition', active === index ? 'border-black bg-neutral-50' : 'border-neutral-200 bg-white hover:border-neutral-400')}><img src={item.image || ''} alt="" className="h-10 w-10 bg-neutral-100 object-cover" /><span className="min-w-0"><b className="block truncate text-xs leading-tight">{label(item) || 'Untitled'}</b><span className="mt-1 block truncate text-[11px] capitalize text-neutral-500">{sublabel(item)}</span></span></button>)}</div></aside>;
+ const [query,setQuery]=useState('');
+  return <aside className="h-max border border-neutral-200 bg-white p-3 shadow-sm lg:sticky lg:top-24"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-neutral-500">Manage</p><h2 className="text-lg font-semibold">{title}</h2></div><Button className="h-9 px-3 text-xs" onClick={onAdd}>Add</Button></div><input aria-label={`Search ${title}`} placeholder={`Search ${title}…`} value={query} onChange={e=>setQuery(e.target.value)} className="w-full border p-2 mb-2"/><div className="grid max-h-[72vh] gap-1 overflow-auto pr-1">{items.map((item, index) => !label(item).toLowerCase().includes(query.toLowerCase()) ? null : <button key={`${label(item)}-${index}`} onClick={() => onSelect(index)} className={cx('grid grid-cols-[42px_1fr] gap-2 border p-1.5 text-left transition', active === index ? 'border-black bg-neutral-50' : 'border-neutral-200 bg-white hover:border-neutral-400')}><img src={item.image || ''} alt="" className="h-10 w-10 bg-neutral-100 object-cover" /><span className="min-w-0"><b className="block truncate text-xs leading-tight">{label(item) || 'Untitled'}</b><span className="mt-1 block truncate text-[11px] capitalize text-neutral-500">{sublabel(item)}</span></span></button>)}</div></aside>;
 }
 
 function Editor({ title, children }){
@@ -291,14 +294,7 @@ function ProjectStatusControl({ value, onChange }){
 }
 
 function ImageField({ label, value, onChange, imageOptions = [] }){
-  const library = imageOptions.filter(image => image.source === 'Media Library');
-  const uploaded = imageOptions.filter(image => image.source === 'Uploaded');
-  const builtin = imageOptions.filter(image => image.source !== 'Uploaded' && image.source !== 'Media Library');
-  function optionGroup(title, options){
-    if(!options.length) return null;
-    return <optgroup label={title}>{options.map(image => <option key={`${title}-${image.url}`} value={image.url}>{image.label || image.url}</option>)}</optgroup>;
-  }
-  return <div className="grid gap-2"><Field label={label}><TextInput value={value} onChange={event => onChange(event.target.value)} placeholder="Image URL or path" /></Field><div className="grid grid-cols-[52px_1fr] gap-2"><img src={value || ''} alt="" className="h-12 w-12 border border-neutral-200 bg-neutral-100 object-cover" /><select value="" onChange={event => { if(event.target.value) onChange(event.target.value); }} className="h-12 min-w-0 border border-neutral-300 bg-white px-3 text-sm text-black"><option value="">{imageOptions.length ? `Pick reusable image (${imageOptions.length})` : 'No images loaded'}</option>{optionGroup('Media Library', library)}{optionGroup('Uploaded Blob URLs', uploaded)}{optionGroup('Built-in Images folder', builtin)}</select></div>{value ? <span className="max-w-full truncate text-[11px] text-neutral-500">{value}</span> : null}</div>;
+  return <ImagePicker label={label} value={value} onChange={onChange} imageOptions={imageOptions}/>;
 }
 
 function Repeat({ title, items, kind, textarea = false, onAdd, onUpdate, onRemove }){

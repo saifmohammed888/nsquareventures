@@ -1,0 +1,119 @@
+/* Final mobile layout pass: shared public pages and the home shell. */
+@media (max-width: 760px) {
+  :root { --site-gutter: 22px; --g: 22px; }
+  html, body { overflow-x: hidden; }
+
+  .ns-public .ns-header.header,
+  .shell .header {
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 0 22px !important;
+    grid-template-columns: 1fr auto !important;
+  }
+  .ns-public .ns-header .nav,
+  .shell .header .nav { display: none !important; }
+  .ns-public .ns-header .head-actions,
+  .shell .header .head-actions { display: flex !important; }
+  .ns-public .ns-header .menu-dot,
+  .shell .header .menu-dot { display: grid !important; }
+  header.header .brand { gap: 10px !important; font-size: 17px !important; }
+  header.header .brand .mark { width: 34px !important; height: 34px !important; font-size: 20px !important; }
+  header.header .brand small { font-size: 8px !important; }
+
+  .shell .hero,
+  .ns-page-hero,
+  .ns-contact-hero,
+  .ns-project-detail-hero { grid-template-columns: 1fr !important; height: auto !important; min-height: 0 !important; }
+  .shell .hero-copy,
+  .ns-page-copy,
+  .ns-contact-hero-copy,
+  .ns-project-detail-copy { min-height: 440px !important; padding: 56px 22px !important; }
+  .shell .hero-copy h1,
+  .ns-page-copy h1,
+  .ns-contact-hero h1,
+  .ns-project-detail-copy h1 { font-size: clamp(52px, 15vw, 68px) !important; line-height: .9 !important; }
+  .shell .hero-copy .lead,
+  .ns-page-copy p,
+  .ns-contact-intro,
+  .ns-project-detail-summary { font-size: 14px !important; }
+  .shell .visual,
+  .shell .visual img,
+  .ns-page-image,
+  .ns-contact-hero-image,
+  .ns-contact-hero-image iframe,
+  .ns-project-image-stack,
+  .ns-project-image-stack .ns-carousel,
+  .ns-project-image-stack .ns-carousel > img { min-height: 380px !important; height: 380px !important; }
+  .shell .actions { display: grid; gap: 10px; }
+  .shell .actions a { width: 100%; justify-content: space-between; }
+
+  .projects,
+  .process,
+  .ns-office-section,
+  .ns-office-expertise { padding: 62px 22px !important; }
+  .projects-head,
+  .process-head,
+  .process-foot,
+  .ns-office-section-head,
+  .ns-office-expertise-head { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .projects h2,
+  .process h2,
+  .ns-office-section-head h2,
+  .ns-office-expertise-head h2 { font-size: clamp(44px, 13vw, 60px) !important; }
+  .process-steps { grid-template-columns: 1fr !important; }
+  .process-step { min-height: 0 !important; padding: 18px 0 !important; border-bottom: 1px solid var(--line) !important; }
+  .process-visual { grid-template-columns: 1fr !important; min-height: 0 !important; }
+  .process-visual .drawing-panel,
+  .process-visual img { min-height: 220px !important; height: 220px !important; }
+
+  .ns-filters { display: flex !important; flex-wrap: wrap !important; padding: 18px 22px !important; overflow: visible !important; }
+  .ns-filters input { width: 100% !important; }
+  .ns-filters .ns-tags { width: 100% !important; max-width: 100% !important; overflow-x: auto !important; padding-bottom: 4px !important; }
+  .ns-filters [role="status"] { width: 100%; margin-left: 0 !important; }
+  .ns-works { grid-template-columns: 1fr !important; padding: 26px 22px 64px !important; gap: 18px !important; }
+  .ns-work .ns-carousel { aspect-ratio: 4 / 3 !important; }
+  .ns-work-details { min-height: 0 !important; padding: 18px !important; }
+  .ns-work h2 { font-size: 28px !important; }
+  .ns-work .ns-work-summary { min-height: 0 !important; -webkit-line-clamp: initial; }
+
+  .ns-project-detail-copy { padding-bottom: 52px !important; }
+  .ns-back-link { margin: 24px 0 42px !important; }
+  .ns-project-facts,
+  .ns-project-scope ul { grid-template-columns: 1fr !important; }
+  .ns-project-facts div { padding: 14px 0 !important; }
+  .ns-project-scope { padding-top: 34px !important; }
+
+  .ns-contact-main { grid-template-columns: 1fr !important; padding: 62px 22px !important; gap: 52px !important; }
+  .ns-contact-form { padding: 0 !important; }
+  .ns-contact-fields { grid-template-columns: 1fr !important; gap: 22px !important; }
+  .ns-contact-fields .ns-contact-message { grid-column: auto !important; }
+  .ns-contact-submit { width: 100%; justify-content: space-between; }
+
+  .ns-office-people-grid,
+  .ns-office-associates-grid,
+  .ns-office-staff-grid { grid-template-columns: 1fr !important; max-width: none !important; margin: 0 !important; }
+  .ns-office-associates-grid .ns-office-person-card:first-child { grid-column: auto !important; display: flex !important; }
+  .ns-office-associates-grid .ns-office-person-card:first-child > img { min-height: 0 !important; height: 300px !important; }
+  .ns-office-associates-grid .ns-office-person-card:first-child .ns-office-person-content { padding: 30px 26px !important; }
+  .ns-office-associates-grid .ns-office-person-card:first-child .ns-office-person-content h3 { font-size: 38px !important; }
+  .ns-office-person-card { min-height: 0 !important; }
+  .ns-office-staff-grid .ns-office-person-card { width: 100%; height: auto !important; min-height: 235px !important; }
+  .ns-office-staff-grid .ns-office-person-illustration { height: 70px !important; }
+
+  .ns-contact-cta { padding: 44px 22px !important; }
+  .ns-contact-cta h2 { font-size: 38px !important; }
+  .site-footer-grid,
+  .site-footer .footer-main { grid-template-columns: 1fr !important; gap: 34px !important; min-height: 0 !important; padding: 56px 22px !important; }
+  .site-footer .brand { font-size: 25px !important; }
+  .site-footer .brand .mark { width: 62px !important; height: 62px !important; font-size: 31px !important; }
+  .site-footer-brand p { margin-top: 30px !important; }
+  .site-footer h2 { margin-bottom: 20px !important; }
+  .site-footer-col,
+  .site-footer .footer-links { gap: 16px !important; }
+}
+
+@media (min-width: 761px) and (max-width: 1050px) {
+  .ns-works { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .ns-office-associates-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ns-office-associates-grid .ns-office-person-card:first-child { grid-column: span 2; }
+}

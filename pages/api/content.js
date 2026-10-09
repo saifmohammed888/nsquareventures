@@ -5,15 +5,18 @@ const {
   readStoredContent,
   writeDatabaseContent
 } = require('../../lib/content-store');
+const { migrate, publicContent } = require('../../lib/content-model');
 
 export default async function handler(req, res){
   if(req.method === 'GET'){
-    res.setHeader('Cache-Control', authorized(req) ? 'no-store' : 'public, max-age=0, s-maxage=15, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', 'no-store');
+    if(req.headers['x-cms-password'] && !authorized(req)) return res.status(401).json({error:'Unauthorized'});
     try{
       const storedContent = await readStoredContent();
-      return res.status(200).json(storedContent || defaultContent());
+      const content = migrate(storedContent || defaultContent());
+      return res.status(200).json(authorized(req) ? content : publicContent(content));
     }catch(error){
-      return res.status(200).json(defaultContent());
+      return res.status(503).json({error:'Content is temporarily unavailable.'});
     }
   }
 

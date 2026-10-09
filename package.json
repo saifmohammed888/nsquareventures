@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "next lint --max-warnings=0 || true"
+    "check": "node --test scripts/content-check.cjs",
+    "migrate:content": "node scripts/migrate-content.cjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,38 +1,74 @@
-import Head from 'next/head';
-import Script from 'next/script';
+import { useState } from 'react';
+import Carousel from '../components/Carousel';
+import { Layout, ContactCTA, useContent } from '../components/Public';
 
-export default function Page(){
+const assetUrl = url => /^(https?:\/\/|\/)/i.test(url || '') ? url : `/${url}`;
+
+function ProjectCard({ project }) {
+  const slides = [project.image, project.secondaryImage]
+    .filter(Boolean)
+    .filter(image => image === project.image || !/wireframe|signature|architect-|favicon|logo/i.test(image))
+    .filter((image, index, list) => list.indexOf(image) === index)
+    .map((image, index) => ({ image: assetUrl(image), alt: `${project.name}${index ? ' — additional view' : ''}` }));
+  const description = project.summary || project.details;
+
   return (
-    <>
-      <Head>
-        <title>Projects — Nsquare Ventures</title>
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <style>{`
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600&display=swap');
-:root{--p:#f8f7f2;--g:#17352f;--t:#44514c;--m:#738078;--l:#d9ddd7;--ser:"Cormorant Garamond",Georgia,serif;--sans:Inter,Arial,sans-serif;--x:clamp(44px,calc(5vw + 20px),112px)}
-*{box-sizing:border-box}body{margin:0;background:var(--p);color:var(--g);font:14px var(--sans)}a{color:inherit;text-decoration:none}img{display:block;width:100%}
-header{height:78px;padding:0 var(--x);display:grid;grid-template-columns:260px 1fr auto;align-items:center;border-bottom:1px solid var(--l)}.brand{display:flex;gap:13px;align-items:center;font:21px var(--ser);letter-spacing:.16em}.mark{width:39px;height:39px;border:1px solid;display:grid;place-items:center}.brand small{display:block;font:10px var(--sans);letter-spacing:.28em}.nav{display:flex;justify-content:center;gap:30px;font-size:12px}.nav .on{border-bottom:1px solid;padding-bottom:8px}.act{display:flex;gap:24px;align-items:center}.dot{width:48px;height:48px;border-radius:50%;background:var(--g);color:white;display:grid;place-items:center}
-.hero{display:grid;grid-template-columns:31.5% 43.8% 24.7%;height:443px;border-bottom:1px solid var(--l);overflow:hidden}.copy{padding:45px 34px 34px var(--x);display:flex;flex-direction:column;justify-content:center}.eye{font-size:10px;letter-spacing:.29em;text-transform:uppercase;color:var(--m)}h1{font:500 clamp(58px,6vw,91px)/.82 var(--ser);letter-spacing:-.045em;margin:22px 0 22px}.copy p{line-height:1.55;color:var(--t);max-width:360px;font-size:13px}.micro{margin-top:26px;border-left:1px solid;padding-left:18px;font-size:9px;line-height:1.9;letter-spacing:.25em;text-transform:uppercase}.heroimg{position:relative;overflow:hidden}.heroimg img{height:100%;object-fit:cover;filter:saturate(.88)}.panel{background:var(--g);color:#f8f7f2;padding:30px 40px;display:flex;flex-direction:column;justify-content:space-between}.panel .label{margin-left:auto;font-size:10px;line-height:1.9;letter-spacing:.28em;text-transform:uppercase;border-left:1px solid #ffffff88;padding-left:22px}.panel strong{font:500 clamp(34px,3.1vw,52px)/1 var(--ser);max-width:290px}.panel .foot{border-top:1px solid #ffffff66;padding-top:17px;font-size:12px;line-height:1.7}
-.filters{position:relative;z-index:2;background:var(--p);padding:0 var(--x);height:62px;border-bottom:1px solid var(--l);display:flex;align-items:center;gap:38px;overflow:hidden}.filters button{border:0;background:none;color:var(--t);padding:21px 0 16px;white-space:nowrap;font:12px var(--sans);cursor:pointer}.filters .on{border-bottom:2px solid var(--g);color:var(--g);font-weight:600}.tools{margin-left:auto;display:flex;align-items:center;gap:22px;border-left:1px solid var(--l);padding-left:24px;color:var(--g)}
-.archive{padding:10px var(--x) 30px;background:var(--p)}.ahead{display:none}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}.project{border:0;padding-top:0}.media{height:214px;overflow:hidden;position:relative;background:#e8e7df}.media img{height:100%;object-fit:cover;transition:.6s;filter:saturate(.9)}.project:hover img{transform:scale(1.025)}.num{position:absolute;right:0;top:0;background:#17352fcf;color:white;padding:17px 18px;font-size:13px}.info{display:grid;grid-template-columns:1fr auto;padding:14px 4px 0}.info h3{font:500 24px var(--ser);margin:0 0 4px}.meta{font-size:12px;color:var(--t);line-height:1.55}.area{font-size:12px;color:var(--t);line-height:1.45;letter-spacing:0;text-transform:none;margin-top:10px;max-width:290px}.arrow{font-size:22px}
-.cta{display:grid;grid-template-columns:1fr 1fr;min-height:380px;background:var(--g);color:#f8f7f2}.ctac{padding:60px var(--x);display:flex;flex-direction:column;justify-content:center}.ctac h2{font:500 clamp(50px,5vw,80px)/.88 var(--ser);margin:20px 0 28px}.ctac a{width:max-content;border-bottom:1px solid #ffffff88;padding-bottom:8px}.art{background:#f1f0ea var(--cms-projects-art-image, url('Images/wireframe.jpg')) center/contain no-repeat}
-footer{background:#203c34;color:#f8f7f2;padding:50px var(--x) 24px}.fm{display:grid;grid-template-columns:1.1fr .8fr .7fr;gap:45px}.tag{font:500 clamp(30px,3.6vw,52px)/.96 var(--ser);margin-top:34px}.links{display:grid;grid-template-columns:1fr 1fr;gap:13px 30px}.links a{border-bottom:1px solid #ffffff2b;padding-bottom:8px}.contact{color:#b9c8c0;line-height:1.9;font-size:12px}.bottom{border-top:1px solid #ffffff2b;margin-top:45px;padding-top:18px;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:#b9c8c0}
-@media(max-width:900px){.nav{display:none}header{grid-template-columns:1fr auto}.hero{grid-template-columns:1fr;height:auto}.heroimg{height:420px}.panel{min-height:360px}.filters{overflow:auto}.tools{display:none}.grid{grid-template-columns:repeat(2,1fr)}.media{height:300px}.fm{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){header{height:70px}.brand{font-size:17px}.act>a{display:none}.copy{padding:45px var(--x)}.heroimg{height:360px}h1{font-size:60px}.grid{grid-template-columns:1fr}.project{margin-bottom:26px}.media{height:285px}.cta{grid-template-columns:1fr}.art{min-height:280px}.fm{grid-template-columns:1fr}.bottom{display:grid;gap:10px}}
-`}</style>
-        <link rel="stylesheet" href="/shared-system.css" />
-      </Head>
-      <div dangerouslySetInnerHTML={{ __html: `
-<header class="header"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><nav class="nav"><a href="/">Home</a><a class="active" href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/gallery">Gallery</a><a href="/contact">Contact</a></nav><div class="act"><a href="/contact">Inquire →</a><button class="dot site-menu-trigger" type="button" aria-label="Open navigation">≡</button></div></header>
-<main>
-<section class="hero"><div class="copy"><div class="eye">Our Work</div><h1>Projects<br>that build<br>better lives.</h1><p>A curated selection of residential, commercial and mixed-use projects - each shaped by context, people and purpose.</p><div class="micro">People&nbsp;&nbsp; Places&nbsp;&nbsp; Possibilities</div></div><div class="heroimg"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="projectsHeroImage" data-fallback-src="Images/Elevation/Praveen Villa - Indiranagar.png" alt="Nsquare residential architecture"></div><aside class="panel"><div class="label">Spaces<br>People<br>Belong In<br>Harmony</div><strong>Good design creates lasting neighbourhoods.</strong><div class="foot">Residential Project<br>Bengaluru <span style="float:right">→</span></div></aside></section>
-<nav class="filters" aria-label="Project filters"><button class="on" data-filter="all">All</button><button data-filter="ongoing">Ongoing</button><button data-filter="completed">Completed</button><button data-filter="residential">Residential</button><button data-filter="apartment">Apartments</button><button data-filter="villa">Villas</button><button data-filter="commercial">Commercial</button></nav>
-<section class="archive"><div class="ahead"><div><div class="eye">Selected Projects</div><h2>Built around context<br>and purpose.</h2></div><p>Each project is approached as a balance of planning, elevation, coordination and the practical realities of building.</p></div><div class="grid" data-cms-projects></div></section>
-<footer class="footer site-footer" id="footer"><div class="footer-main site-footer-grid"><div class="site-footer-brand"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><p>Architecture-led design and delivery<br>in Bengaluru.</p></div><nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/projects">Projects</a><a href="/expertise">Expertise</a><a href="/journal">Journal</a><a href="/gallery">Gallery</a><a href="/contact">Contact</a></nav><div class="site-footer-col"><h2>Practice</h2><a href="/expertise">Architecture</a><a href="/expertise">Interiors</a><a href="/expertise">Construction</a><a href="/expertise#elevation">Approvals &amp; Coordination</a><a href="/expertise#elevation">Elevation Consultation</a></div><div class="footer-contact site-footer-location"><h2>Based In</h2><strong>Bengaluru<br>Karnataka<br>India</strong><a href="/contact">Start a conversation <span>→</span></a></div></div></footer>
-</main>
-<div class="site-scrim" id="siteScrim"></div><aside class="site-side" id="siteSide" aria-hidden="true"><div class="site-side-top"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><button class="site-close" id="siteMenuClose" type="button">Close ×</button></div><div class="site-side-label">Menu</div><nav class="site-side-nav"><a href="/">Home <span>01</span></a><a href="/projects">Projects <span>02</span></a><a href="/expertise">Expertise <span>03</span></a><a href="/journal">Journal <span>04</span></a><a href="/gallery">Gallery <span>05</span></a><a href="/contact">Contact <span>06</span></a></nav><div class="site-side-foot"><div>Spaces<br>People<br>Belong in Harmony</div><div class="site-cross" aria-hidden="true"></div></div></aside>` }} />
-      <Script src="/projects-data.js" strategy="afterInteractive" />
-      <Script src="/shared-system.js" strategy="afterInteractive" />
-    </>
+    <article className="ns-work">
+      <a className="ns-work-card-link" href={`/works/${project.slug}`} aria-label={`View ${project.name} project details`}>
+        <Carousel slides={slides} controls={false} duration={6} transition={0.6} />
+        <div className="ns-work-details">
+          <h2>{project.name}</h2>
+          <p className="ns-work-location">{project.location}</p>
+          {description && <p className="ns-work-summary">{description}</p>}
+          <dl>
+            <div><dt>Area</dt><dd>{project.area || '—'}</dd></div>
+            <div><dt>Status</dt><dd>{project.status || 'Ongoing'}</dd></div>
+            {project.client && <div><dt>Client</dt><dd>{project.client}</dd></div>}
+          </dl>
+          <span className="ns-work-link">View project <span aria-hidden="true">→</span></span>
+        </div>
+      </a>
+    </article>
+  );
+}
+
+export default function Works() {
+  const { data, error } = useContent();
+  const [tag, setTag] = useState('');
+  const [search, setSearch] = useState('');
+  const projects = (data?.projects || []).filter(project =>
+    (!tag || project.tagIds.includes(tag)) && project.name.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  return (
+    <Layout title="Works" active="Works">
+      <section className="ns-page-hero">
+        <div className="ns-page-copy">
+          <div className="ns-overline">Selected projects</div>
+          <h1>Works.</h1>
+          <p>Our work spans villas, residences, commercial buildings, apartments and schools in Bengaluru and across Karnataka. Project dimensions and current status are shown below.</p>
+          <div className="ns-page-keywords">Villas · Residences · Commercial · Institutions</div>
+        </div>
+        <div className="ns-page-image">
+          {data?.projects?.[1]?.image && <img src={assetUrl(data.projects[1].image)} alt={data.projects[1].name} />}
+        </div>
+      </section>
+
+      <section className="ns-filters" aria-label="Filter works">
+        <input type="search" aria-label="Search project names" placeholder="Search project names…" value={search} onChange={event => setSearch(event.target.value)} />
+        <div className="ns-tags">
+          {[{ id: '', name: 'All' }, ...(data?.tags || [])].map(item => (
+            <button key={item.id} aria-pressed={tag === item.id} onClick={() => setTag(item.id)}>{item.name}</button>
+          ))}
+        </div>
+        <span role="status">{data ? `${projects.length} works` : error || 'Loading works…'}</span>
+      </section>
+
+      <section className="ns-works">
+        {projects.map(project => <ProjectCard key={project.slug} project={project} />)}
+        {data && !projects.length && <p className="ns-empty">No works match this selection. Clear your search or choose another tag.</p>}
+      </section>
+      <ContactCTA />
+    </Layout>
   );
 }

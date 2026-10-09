@@ -1,16 +1,23 @@
 (function(){
+  document.querySelectorAll('a[href="/journal"],a[href="/gallery"],a[href="/project-detail"],a[href="/presentation"]').forEach(link => link.remove());
   const triggerSelectors = ['.site-menu-trigger', '#menuOpen', '.menu-dot', '.dot'];
   const triggers = [...document.querySelectorAll(triggerSelectors.join(','))];
   const side = document.getElementById('siteSide') || document.getElementById('side');
   const scrim = document.getElementById('siteScrim') || document.getElementById('scrim');
   if(!side || !scrim || !triggers.length) return;
+  side.inert = true;
+  let opener = null;
 
   function setMenu(open){
+    if(open) opener = document.activeElement;
+    side.inert = !open;
     side.classList.toggle('open', open);
     scrim.classList.toggle('open', open);
     side.setAttribute('aria-hidden', String(!open));
     triggers.forEach(trigger => trigger.setAttribute('aria-expanded', String(open)));
     document.body.style.overflow = open ? 'hidden' : '';
+    if(open) side.querySelector('button,a')?.focus();
+    else opener?.focus();
   }
 
   triggers.forEach(trigger => {
@@ -29,13 +36,18 @@
   scrim.addEventListener('click', () => setMenu(false));
   document.addEventListener('keydown', event => {
     if(event.key === 'Escape') setMenu(false);
+    if(event.key === 'Tab' && side.classList.contains('open')){
+      const items=[...side.querySelectorAll('a,button')];const first=items[0],last=items[items.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
   });
   side.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
 })();
 
 const NSQUARE_FALLBACK_CONTENT = {
-  projects: window.NSQUARE_PROJECTS || [],
-  articles: window.NSQUARE_ARTICLES || [],
+  projects: [],
+  articles: [],
   site: {}
 };
 
@@ -84,13 +96,7 @@ function nsPreloadImage(src, priority){
   image.src = src;
 }
 
-function nsPreloadContentImages(content){
-  const images = [];
-  Object.values(content.site || {}).forEach(value => images.push(value));
-  (content.projects || []).forEach(project => images.push(project.image, project.secondaryImage));
-  (content.articles || []).forEach(article => images.push(article.image, article.secondaryImage));
-  images.filter(Boolean).slice(0, 80).forEach((src, index) => nsPreloadImage(src, index < 10));
-}
+function nsPreloadContentImages(content){}
 
 function nsLoadImage(src){
   if(!src) return Promise.resolve();
@@ -187,7 +193,7 @@ nsBindProjectFilters();
     const project = projects.find(item => item.slug === slug);
 
     if(!project){
-      mount.innerHTML = '<section class="detail-empty"><div class="eyebrow">Project</div><h1>Project not found.</h1><p><a href="projects.html">Return to projects →</a></p></section>';
+      mount.innerHTML = '<section class="detail-empty"><div class="eyebrow">Project</div><h1>Project not found.</h1><p><a href="projects.html">Return to works →</a></p></section>';
       return;
     }
 
@@ -202,7 +208,7 @@ nsBindProjectFilters();
           <p>${nsEscape(project.summary)}</p>
           <div class="detail-actions">
             <a href="contact.html?project=${encodeURIComponent(project.name)}">Discuss this project <span>→</span></a>
-            <a href="projects.html">Back to projects <span>→</span></a>
+            <a href="projects.html">Back to works <span>→</span></a>
           </div>
         </div>
         <div class="detail-image cms-image-shell">${nsImage(project.image, project.name)}</div>
@@ -250,6 +256,7 @@ nsBindProjectFilters();
       `Message: ${data.get('message') || ''}`
     ].join('\n');
 
+    if(!architectWhatsAppNumber){ let notice=form.querySelector('[role=alert]'); if(!notice){notice=document.createElement('p');notice.setAttribute('role','alert');form.append(notice);} notice.textContent='Online enquiry delivery is not configured yet. Your message has not been sent.';return;}
     const encodedMessage = encodeURIComponent(message);
     const whatsAppUrl = architectWhatsAppNumber
       ? `https://wa.me/${architectWhatsAppNumber}?text=${encodedMessage}`
@@ -325,7 +332,7 @@ nsBindProjectFilters();
 
     const cmsImageAssignments = [...document.querySelectorAll('img[data-cms-image]')].map(img => ({
       img,
-      src: siteImageValue(img.dataset.cmsImage) || img.dataset.fallbackSrc
+      src: Object.prototype.hasOwnProperty.call(site,img.dataset.cmsImage) ? site[img.dataset.cmsImage] : siteImageValue(img.dataset.cmsImage) || img.dataset.fallbackSrc
     }));
     await nsWaitForImages(cmsImageAssignments.map(item => item.src));
     cmsImageAssignments.forEach(({ img, src }) => {
@@ -364,14 +371,13 @@ nsBindProjectFilters();
     if(homeGrid){
       const ongoing = projects.filter(project => nsProjectStatus(project) === 'ongoing').slice(0, 5);
       const completed = projects.filter(project => nsProjectStatus(project) === 'completed').slice(0, 5);
-      await nsWaitForImages([...ongoing, ...completed].flatMap(project => [project.image, project.secondaryImage || project.image]));
       const card = project => `
         <a class="card" href="project-detail.html?project=${encodeURIComponent(project.slug)}">
-          <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}${nsImage(project.secondaryImage || project.image, `${project.name} supporting image`)}</div>
+          <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}</div>
           <div class="card-info"><h3>${nsEscape(project.name)}</h3><p>${nsEscape(project.summary)}</p><div class="project-meta"><span><b>Client</b>${nsEscape(project.client)}</span><span><b>Location</b>${nsEscape(project.location)}</span><span><b>Area</b>${nsEscape(project.area)}</span></div><span class="arrow">→</span></div>
         </a>
       `;
-      homeGrid.innerHTML = `<div class="project-group">Ongoing Projects</div>${ongoing.map(card).join('')}<div class="project-group">Completed Projects</div>${completed.map(card).join('')}`;
+      homeGrid.innerHTML = `<div class="project-group">Ongoing Works</div>${ongoing.map(card).join('')}<div class="project-group">Completed Works</div>${completed.map(card).join('')}`;
       nsInitImageLoading(homeGrid);
     }
 
@@ -417,4 +423,8 @@ nsBindProjectFilters();
     }
     nsInitImageLoading(document);
   }));
+})();
+
+(function(){
+ document.querySelectorAll('.nav a').forEach(a=>{if(a.pathname===location.pathname || (location.pathname==='/project-detail' && a.pathname==='/projects'))a.setAttribute('aria-current','page');});
 })();
