@@ -1,23 +1,21 @@
-import { Layout } from '../components/Public';
+import { Layout, useContent } from '../components/Public';
 
 const address = '465, 2nd Main Rd, opposite to TVS Service Centre, 3rd Block, HBR Layout, Bengaluru, Karnataka 560043';
 const mapUrl = 'https://www.google.com/maps/place/N+Square/@13.0264548,77.588248,14z/data=!4m10!1m2!2m1!1s465,+2nd+Main+Rd,+opposite+to+TVS+Service+Centre,+3rd+Block,+HBR+Layout,+Bengaluru,+Karnataka+560043!3m6!1s0x3bae1707cde8a947:0x1e2781d4000ee764!8m2!3d13.0264548!4d77.6263568!15sCmQ0NjUsIDJuZCBNYWluIFJkLCBvcHBvc2l0ZSB0byBUVlMgU2VydmljZSBDZW50cmUsIDNyZCBCbG9jaywgSEJSIExheW91dCwgQmVuZ2FsdXJ1LCBLYXJuYXRha2EgNTYwMDQzIgOIAQGSARFhcmNoaXRlY3R1cmVfZmlybeABAA!16s%2Fg%2F11fk1kql1x?entry=ttu&g_ep=EgoyMDI2MTAwNS4wIKXMDSoASAFQAw%3D%3D';
 const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(`N Square Architects, ${address}`)}&output=embed`;
 
 export default function Contact() {
+  const { data } = useContent();
+  const hero = data?.pageHeroes?.contact;
   return (
     <Layout title="Contact" active="Contact">
       <main className="ns-contact">
         <section className="ns-contact-hero">
           <div className="ns-contact-hero-copy">
-            <p className="ns-overline">Let’s connect</p>
-            <h1>Let’s build<br />what’s next.</h1>
-            <p className="ns-contact-intro">
-              Whether you’re planning a new home, exploring a development, need
-              elevation design support, or want to discuss a collaboration — start
-              the conversation here.
-            </p>
-            <p className="ns-page-keywords">People · Plans · Places · Possibilities</p>
+            <p className="ns-overline">{hero?.eyebrow || 'Let’s connect'}</p>
+            <h1>{(hero?.title || 'Let’s build\nwhat’s next.').split('\n').map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h1>
+            <p className="ns-contact-intro">{hero?.copy || 'Whether you’re planning a new home, exploring a development, need elevation design support, or want to discuss a collaboration — start the conversation here.'}</p>
+            <p className="ns-page-keywords">{hero?.keywords || 'People · Plans · Places · Possibilities'}</p>
           </div>
 
           <div className="ns-contact-hero-image">

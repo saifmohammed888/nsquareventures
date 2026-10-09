@@ -39,18 +39,19 @@ export default function Works() {
   const projects = (data?.projects || []).filter(project =>
     (!tag || project.tagIds.includes(tag)) && project.name.toLowerCase().includes(search.trim().toLowerCase())
   );
+  const hero = data?.pageHeroes?.works;
 
   return (
     <Layout title="Works" active="Works">
       <section className="ns-page-hero">
         <div className="ns-page-copy">
-          <div className="ns-overline">Selected projects</div>
-          <h1>Works.</h1>
-          <p>Our work spans villas, residences, commercial buildings, apartments and schools in Bengaluru and across Karnataka. Project dimensions and current status are shown below.</p>
-          <div className="ns-page-keywords">Villas · Residences · Commercial · Institutions</div>
+          <div className="ns-overline">{hero?.eyebrow || 'Selected projects'}</div>
+          <h1>{hero?.title || 'Works.'}</h1>
+          <p>{hero?.copy || 'Our work spans villas, residences, commercial buildings, apartments and schools in Bengaluru and across Karnataka. Project dimensions and current status are shown below.'}</p>
+          <div className="ns-page-keywords">{hero?.keywords || 'Villas · Residences · Commercial · Institutions'}</div>
         </div>
         <div className="ns-page-image">
-          {data?.projects?.[1]?.image && <img src={assetUrl(data.projects[1].image)} alt={data.projects[1].name} />}
+          {(hero?.image || data?.projects?.[1]?.image) && <img src={assetUrl(hero?.image || data.projects[1].image)} alt={hero?.title || data.projects[1]?.name || 'N Square Ventures work'} />}
         </div>
       </section>
 

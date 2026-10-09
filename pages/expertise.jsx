@@ -40,18 +40,19 @@ function PeopleSection({ title, eyebrow, people, variant = '', intro }) {
 export default function Office() {
   const { data, error } = useContent();
   const heroProject = data?.projects?.[0];
+  const hero = data?.pageHeroes?.office;
 
   return (
     <Layout title="Office" active="Office">
       <section className="ns-page-hero ns-office-page-hero">
         <div className="ns-page-copy">
-          <div className="ns-overline">People · Practice · Perspective</div>
-          <h1>Office.</h1>
-          <p>{data?.home.introduction || 'N Square Ventures brings together design thinking, technical knowledge and on-ground experience to deliver spaces made for real life.'}</p>
-          <div className="ns-page-keywords">Associates · Staff · Design · Delivery</div>
+          <div className="ns-overline">{hero?.eyebrow || 'People · Practice · Perspective'}</div>
+          <h1>{hero?.title || 'Office.'}</h1>
+          <p>{hero?.copy || data?.home.introduction || 'N Square Ventures brings together design thinking, technical knowledge and on-ground experience to deliver spaces made for real life.'}</p>
+          <div className="ns-page-keywords">{hero?.keywords || 'Associates · Staff · Design · Delivery'}</div>
         </div>
         <div className="ns-page-image">
-          {heroProject?.image && <img src={assetUrl(heroProject.image)} alt={heroProject.name} />}
+          {(hero?.image || heroProject?.image) && <img src={assetUrl(hero?.image || heroProject.image)} alt={hero?.title || heroProject?.name || 'N Square Ventures office'} />}
         </div>
       </section>
 
