@@ -30,7 +30,7 @@ body .header .nav{font-size:16px;font-weight:600;gap:38px}body .header .brand{fo
 /* One header logo specification across all public pages. */
 header.header .brand{display:flex!important;align-items:center!important;gap:13px!important;font:400 21px var(--site-serif)!important;letter-spacing:.16em!important;line-height:1!important}header.header .brand .mark{width:39px!important;height:39px!important;border:1px solid currentColor!important;display:grid!important;place-items:center!important;font:500 23px var(--site-serif)!important;flex:none!important}header.header .brand small{display:block!important;font:500 10px var(--site-sans)!important;letter-spacing:.28em!important;line-height:1!important;margin-top:2px!important}
 /* Navigation link typography is deliberately identical on every route, including the active page. */
-header.header .nav a,header.header .nav a[aria-current="page"]{font-family:Inter,Arial,sans-serif!important;font-size:12px!important;font-weight:500!important;letter-spacing:.01em!important;line-height:1!important}
+header.header .nav a,header.header .nav a[aria-current="page"]{font-family:Inter,Arial,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.015em!important;line-height:1!important}
 
 /* Contact */
 .ns-contact-hero{display:grid;grid-template-columns:41% 59%;min-height:650px;height:clamp(650px,62vw,720px);border-bottom:1px solid var(--ns-rule)}

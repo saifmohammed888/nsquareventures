@@ -358,7 +358,7 @@ nsBindProjectFilters();
     if(projectGrid){
       await nsWaitForImages(projects.map(project => project.image));
       projectGrid.innerHTML = projects.map((project, index) => `
-        <a class="project" href="project-detail.html?project=${encodeURIComponent(project.slug)}" data-status="${nsEscape(nsProjectStatus(project))}" data-type="${nsEscape(project.type)}">
+        <a class="project" href="/works/${encodeURIComponent(project.slug)}" data-status="${nsEscape(nsProjectStatus(project))}" data-type="${nsEscape(project.type)}">
           <div class="media cms-image-shell">${nsImage(project.image, project.name)}<span class="num">${String(index + 1).padStart(2, '0')}</span></div>
           <div class="info"><div><h3>${nsEscape(project.name)}</h3><div class="meta">${nsEscape(project.location)}</div><div class="area">${nsEscape(project.area)} · ${nsEscape(nsProjectStatus(project))}</div></div><span class="arrow">→</span></div>
         </a>
@@ -372,7 +372,7 @@ nsBindProjectFilters();
       const ongoing = projects.filter(project => nsProjectStatus(project) === 'ongoing').slice(0, 5);
       const completed = projects.filter(project => nsProjectStatus(project) === 'completed').slice(0, 5);
       const card = project => `
-        <a class="card" href="project-detail.html?project=${encodeURIComponent(project.slug)}">
+        <a class="card" href="/works/${encodeURIComponent(project.slug)}">
           <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}</div>
           <div class="card-info"><h3>${nsEscape(project.name)}</h3><p>${nsEscape(project.summary)}</p><div class="project-meta"><span><b>Client</b>${nsEscape(project.client)}</span><span><b>Location</b>${nsEscape(project.location)}</span><span><b>Area</b>${nsEscape(project.area)}</span></div><span class="arrow">→</span></div>
         </a>
