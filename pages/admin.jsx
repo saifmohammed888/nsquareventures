@@ -1,7 +1,7 @@
 import WebsiteEditor, {ProjectFields,ImagePicker,ImageListPicker} from '../components/WebsiteEditor';
 import Head from 'next/head';
 import Script from 'next/script';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const emptyProject = { slug: 'new-work', name: 'New Work', status: 'ongoing', published: false, tagIds: [], type: '', location: '', area: '', client: '', image: '', secondaryImages: [], summary: '', details: '', scope: [] };
 const emptyArticle = { slug: 'new-blog', title: 'New Blog', category: 'Journal', categories: 'insights', image: '', secondaryImage: '', alt: '', summary: '', takeaways: [], body: [] };
@@ -146,15 +146,19 @@ export default function Admin(){
     }finally{ setVerifying(false); }
   }
 
-  async function saveContent(){
+  async function saveContent(nextContent = content){
     setSaving(true);
     setStatus('Saving...');
     try{
-      const body = mergeUploadedImages(tab === 'raw' ? JSON.parse(raw || '{}') : content);
+      const body = mergeUploadedImages(nextContent);
       const saved = await writeContent(body);
       setContent(saved);
       setStatus('Saved. Refresh the public site to see updates.');
-    }catch(error){ setStatus(error.message); }
+      return { ok: true, content: saved };
+    }catch(error){
+      setStatus(error.message);
+      return { ok: false, error: error.message || 'Unable to save content.' };
+    }
     finally{ setSaving(false); }
   }
 
@@ -280,7 +284,7 @@ export default function Admin(){
           {tab === 'content' && <ContentManager content={content} onOpen={setContentModal}/>}
           {tab === 'projects' && <ProjectsTab imageOptions={mediaOptions} content={content} setContent={setContent} project={project} projectIndex={projectIndex} setProjectIndex={setProjectIndex} updateProject={updateProject} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} />}
           {tab === 'images' && <ImagesTab imageOptions={mediaOptions} content={content} setContent={setContent} uploading={uploading} mediaDraft={mediaDraft} setMediaDraft={setMediaDraft} uploadMedia={uploadMedia} sync={sync} mediaSearch={mediaSearch} setMediaSearch={setMediaSearch} writeContent={writeContent} loadImages={loadImages} setStatus={setStatus} authHeaders={authHeaders} />}
-          {contentModal && <ContentModal section={contentModal} content={content} setContent={setContent} sync={sync} imageOptions={mediaOptions} onClose={() => setContentModal('')} />}
+          {contentModal && <ContentModal section={contentModal} content={content} sync={sync} imageOptions={mediaOptions} saving={saving} onSave={saveContent} onClose={() => setContentModal('')} />}
         </div>
         </section>
       </main>
@@ -302,15 +306,46 @@ function ContentManager({ content, onOpen }){
     ['Presentation', 'Presentation images, ordering, timing and display fit', 'Presentation'],
     ['Media visibility', 'Public and presentation eligibility for media', 'Media visibility']
   ];
-  return <Editor title="Content Manager"><p className="text-sm text-neutral-600">Select a content area to view or edit it. All edits save through the standard Save Changes button.</p><div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left text-sm"><thead className="border-b cms-border text-xs uppercase tracking-wide text-neutral-500"><tr><th className="p-3">Content area</th><th className="p-3">What it manages</th><th className="p-3 text-right">Actions</th></tr></thead><tbody>{records.map(([name,description,section])=><tr key={section} className="border-b cms-border"><td className="p-3 font-semibold cms-text">{name}</td><td className="p-3 text-neutral-600">{description}</td><td className="p-3 text-right"><Button tone="light" className="mr-2 h-8 px-3 text-xs" onClick={()=>onOpen(section)}>View</Button><Button className="h-8 px-3 text-xs" onClick={()=>onOpen(section)}>Edit</Button></td></tr>)}</tbody></table></div></Editor>;
+  return <Editor title="Content Manager"><p className="text-sm text-neutral-600">Select a content area to view or edit it. Each editor includes its own Save Changes action.</p><div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left text-sm"><thead className="border-b cms-border text-xs uppercase tracking-wide text-neutral-500"><tr><th className="p-3">Content area</th><th className="p-3">What it manages</th><th className="p-3 text-right">Actions</th></tr></thead><tbody>{records.map(([name,description,section])=><tr key={section} className="border-b cms-border"><td className="p-3 font-semibold cms-text">{name}</td><td className="p-3 text-neutral-600">{description}</td><td className="p-3 text-right"><Button tone="light" className="mr-2 h-8 px-3 text-xs" onClick={()=>onOpen(section)}>View</Button><Button className="h-8 px-3 text-xs" onClick={()=>onOpen(section)}>Edit</Button></td></tr>)}</tbody></table></div></Editor>;
 }
 
-function ContentModal({ section, content, setContent, sync, imageOptions, onClose }){
-  const update = next => setContent(sync(next));
-  const home = content.home || { slides: [], introduction: '' };
-  const heroes = content.pageHeroes || {};
-  const updateHero = (page, key, value) => update({ ...content, pageHeroes: { ...heroes, [page]: { ...(heroes[page] || {}), [key]: value } } });
-  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-label={`Edit ${section}`}><div className="max-h-[92vh] w-full max-w-4xl overflow-auto rounded-lg bg-white p-6 shadow-2xl"><div className="mb-5 flex items-center justify-between border-b cms-border pb-4"><div><p className="text-xs uppercase tracking-[.2em] text-neutral-500">Content Manager</p><h2 className="text-2xl font-semibold cms-text">{section}</h2></div><Button tone="light" className="h-9 px-3" onClick={onClose}>Close</Button></div>{section==='Page Heroes'?<div className="grid gap-6">{[['works','Works'],['office','Office'],['contact','Contact']].map(([page,label])=>{const hero=heroes[page]||{};return <section key={page} className="border-b cms-border pb-5"><h3 className="mb-3 text-lg font-semibold">{label}</h3><div className="grid gap-4 md:grid-cols-2"><Field label="Eyebrow"><TextInput value={hero.eyebrow||''} onChange={e=>updateHero(page,'eyebrow',e.target.value)}/></Field><Field label="Heading"><TextInput value={hero.title||''} onChange={e=>updateHero(page,'title',e.target.value)}/></Field></div><Field label="Supporting copy"><TextArea value={hero.copy||''} onChange={e=>updateHero(page,'copy',e.target.value)}/></Field><Field label="Keywords"><TextInput value={hero.keywords||''} onChange={e=>updateHero(page,'keywords',e.target.value)}/></Field>{page!=='contact'&&<ImageField label={`${label} hero image`} value={hero.image||''} onChange={value=>updateHero(page,'image',value)} imageOptions={imageOptions}/>}</section>})}</div>:<WebsiteEditor content={content} onChange={update} images={imageOptions} initialSection={section} lockedSection/>}</div></div>;
+function ContentModal({ section, content, sync, imageOptions, saving, onSave, onClose }){
+  const [draft, setDraft] = useState(content);
+  const [dirty, setDirty] = useState(false);
+  const [result, setResult] = useState('');
+  const dialog = useRef(null);
+
+  useEffect(() => {
+    setDraft(content);
+    setDirty(false);
+    setResult('');
+    dialog.current?.focus();
+  }, [section]);
+
+  const update = next => { setDraft(sync(next)); setDirty(true); setResult(''); };
+  const heroes = draft.pageHeroes || {};
+  const updateHero = (page, key, value) => update({ ...draft, pageHeroes: { ...heroes, [page]: { ...(heroes[page] || {}), [key]: value } } });
+  const close = () => {
+    if(dirty && !window.confirm('Discard unsaved changes to this content area?')) return;
+    onClose();
+  };
+  const save = async () => {
+    setResult('Saving changes…');
+    const saved = await onSave(draft);
+    if(saved.ok){
+      setDraft(saved.content);
+      setDirty(false);
+      setResult('Saved successfully. Your public site will use the updated content.');
+    }else setResult(saved.error || 'Saving failed. Your edits are still open; please try again.');
+  };
+
+  useEffect(() => {
+    const onKeyDown = event => { if(event.key === 'Escape') close(); };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [dirty]);
+
+  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-3 sm:p-4" role="presentation"><div ref={dialog} tabIndex="-1" className="flex max-h-[94vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg bg-white shadow-2xl outline-none" role="dialog" aria-modal="true" aria-label={`Edit ${section}`}><div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b cms-border bg-white p-4 sm:p-6"><div><p className="text-xs uppercase tracking-[.2em] text-neutral-500">Content Manager</p><h2 className="text-xl font-semibold cms-text sm:text-2xl">{section}</h2><p className="mt-1 text-xs text-neutral-500">{dirty ? 'Unsaved changes' : 'All changes saved'}</p></div><div className="flex flex-wrap gap-2"><Button tone="light" className="h-10 px-3" onClick={close}>Close</Button><Button className="h-10 px-3" onClick={save} disabled={saving || !dirty}>{saving ? 'Saving…' : 'Save Changes'}</Button></div></div>{result&&<p className={cx('mx-4 mt-3 rounded-md px-3 py-2 text-sm sm:mx-6', result.startsWith('Saved') ? 'bg-emerald-50 text-emerald-800' : result.startsWith('Saving') ? 'bg-slate-50 text-slate-700' : 'bg-red-50 text-red-700')} role="status">{result}</p>}<div className="min-h-0 overflow-auto p-4 sm:p-6">{section==='Page Heroes'?<div className="grid gap-6">{[['works','Works'],['office','Office'],['contact','Contact']].map(([page,label])=>{const hero=heroes[page]||{};return <section key={page} className="border-b cms-border pb-5"><h3 className="mb-3 text-lg font-semibold">{label}</h3><div className="grid gap-4 md:grid-cols-2"><Field label="Eyebrow"><TextInput value={hero.eyebrow||''} onChange={e=>updateHero(page,'eyebrow',e.target.value)}/></Field><Field label="Heading"><TextInput value={hero.title||''} onChange={e=>updateHero(page,'title',e.target.value)}/></Field></div><Field label="Supporting copy"><TextArea value={hero.copy||''} onChange={e=>updateHero(page,'copy',e.target.value)}/></Field><Field label="Keywords"><TextInput value={hero.keywords||''} onChange={e=>updateHero(page,'keywords',e.target.value)}/></Field>{page!=='contact'&&<ImageField label={`${label} hero image`} value={hero.image||''} onChange={value=>updateHero(page,'image',value)} imageOptions={imageOptions}/>}</section>})}</div>:<WebsiteEditor content={draft} onChange={update} images={imageOptions} initialSection={section} lockedSection/>}</div></div></div>;
 }
 
 function BlogsTab({ content, setContent, article, articleIndex, setArticleIndex, updateArticle, updateList, addListItem, removeListItem, sync, imageOptions }){
@@ -336,10 +371,13 @@ function ImagesTab({ imageOptions, content, setContent, uploading, mediaDraft, s
     if(!confirm(`Permanently delete ${item.name || 'this image'}? This cannot be undone.`)) return;
     const inUse = [
       ...(content.projects || []).flatMap(work => [work.image, ...(work.secondaryImages || []), work.secondaryImage]),
+      ...(content.articles || []).flatMap(article => [article.image, article.secondaryImage]),
       ...(content.home?.slides || []).map(slide => slide.image),
       ...(content.presentation?.images || []).map(slide => slide.image),
       ...(content.associates || []).map(person => person.image),
-      ...(content.staff || []).map(person => person.image)
+      ...(content.staff || []).map(person => person.image),
+      ...Object.values(content.site || {}),
+      ...Object.values(content.pageHeroes || {}).map(hero => hero?.image)
     ].includes(item.url);
     if(inUse){ setStatus('This image is in use. Remove or replace it from the related content before deleting it.'); return; }
     setStatus('Deleting image...');
