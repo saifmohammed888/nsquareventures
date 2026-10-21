@@ -146,11 +146,14 @@ export default function Admin(){
     }finally{ setVerifying(false); }
   }
 
-  async function saveContent(nextContent = content){
+  async function saveContent(nextContent){
     setSaving(true);
     setStatus('Saving...');
     try{
-      const body = mergeUploadedImages(nextContent);
+      // Button handlers receive a React click event. Only an actual CMS
+      // content document may be saved; otherwise retain the current state.
+      const source = nextContent && Array.isArray(nextContent.projects) ? nextContent : content;
+      const body = mergeUploadedImages(source);
       const saved = await writeContent(body);
       setContent(saved);
       setStatus('Saved. Refresh the public site to see updates.');
@@ -301,7 +304,7 @@ export default function Admin(){
         <header className="sticky top-0 z-20 border-b cms-border bg-[#FBFCF9] px-5 py-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div><p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Nsquare CMS</p><h1 className="text-3xl font-semibold tracking-tight cms-text">{pageTitle}</h1><p className={cx('mt-1 text-sm', status.toLowerCase().includes('unable') || status.toLowerCase().includes('failed') || status.toLowerCase().includes('error') ? 'text-red-700' : 'text-slate-500')}>{saving ? 'Saving changes...' : status}</p></div>
-            <div className="flex flex-wrap gap-2"><a href="/" target="_blank" className="inline-flex h-11 items-center justify-center rounded-md border cms-border bg-white px-4 text-sm font-semibold cms-text">View Website ↗</a><Button onClick={saveContent} disabled={saving} className="rounded-md cms-green">{saving ? 'Saving...' : 'Save Changes'}</Button><Button tone="light" className="rounded-md" onClick={() => loadContent().catch(error => setStatus(error.message))}>Reload</Button><Button tone="light" className="rounded-md" onClick={logout}>Lock</Button></div>
+            <div className="flex flex-wrap gap-2"><a href="/" target="_blank" className="inline-flex h-11 items-center justify-center rounded-md border cms-border bg-white px-4 text-sm font-semibold cms-text">View Website ↗</a><Button onClick={() => saveContent()} disabled={saving} className="rounded-md cms-green">{saving ? 'Saving...' : 'Save Changes'}</Button><Button tone="light" className="rounded-md" onClick={() => loadContent().catch(error => setStatus(error.message))}>Reload</Button><Button tone="light" className="rounded-md" onClick={logout}>Lock</Button></div>
           </div>
         </header>
 
