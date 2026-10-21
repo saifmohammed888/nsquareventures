@@ -169,6 +169,28 @@ export default function Admin(){
     return sync(data.content);
   }
 
+  async function deleteProject(){
+    if(!project || !confirm(`Delete “${project.name || 'this work'}” permanently? This cannot be undone.`)) return;
+    setSaving(true);
+    setStatus('Deleting work...');
+    try{
+      const response = await fetch(`/api/content?projectSlug=${encodeURIComponent(project.slug)}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+      const data = await response.json();
+      if(!response.ok) throw new Error(data.error || 'Unable to delete the work.');
+      // Reload from the durable store rather than trusting the local filtered
+      // list, so a refresh/session sees exactly the same result.
+      await loadContent();
+      setStatus(`Deleted ${project.name || 'work'} permanently.`);
+    }catch(error){
+      setStatus(error.message || 'Unable to delete the work.');
+    }finally{
+      setSaving(false);
+    }
+  }
+
   function logout(){ sessionStorage.removeItem('nsquare_cms_password'); setAuthed(false); setPassword(''); setStatus('Locked.'); }
 
   function updateProject(key, value){
@@ -288,7 +310,7 @@ export default function Admin(){
           <div className="lg:hidden"><select value={tab} onChange={event => setTab(event.target.value)} className="h-11 w-full rounded-md border cms-border bg-white px-3 text-sm"><option value="content">Content Manager</option><option value="projects">Works</option><option value="images">Media / Images</option></select></div>
 
           {tab === 'content' && <ContentManager content={content} onOpen={setContentModal}/>}
-          {tab === 'projects' && <ProjectsTab imageOptions={mediaOptions} content={content} setContent={setContent} project={project} projectIndex={projectIndex} setProjectIndex={setProjectIndex} updateProject={updateProject} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} saving={saving} onSave={saveContent} />}
+          {tab === 'projects' && <ProjectsTab imageOptions={mediaOptions} content={content} setContent={setContent} project={project} projectIndex={projectIndex} setProjectIndex={setProjectIndex} updateProject={updateProject} updateList={updateList} addListItem={addListItem} removeListItem={removeListItem} sync={sync} saving={saving} onSave={saveContent} onDelete={deleteProject} />}
           {tab === 'images' && <ImagesTab imageOptions={mediaOptions} content={content} setContent={setContent} uploading={uploading} mediaDraft={mediaDraft} setMediaDraft={setMediaDraft} uploadMedia={uploadMedia} sync={sync} mediaSearch={mediaSearch} setMediaSearch={setMediaSearch} writeContent={writeContent} loadImages={loadImages} setStatus={setStatus} authHeaders={authHeaders} />}
           {contentModal && <ContentModal section={contentModal} content={content} sync={sync} imageOptions={mediaOptions} saving={saving} onSave={saveContent} onClose={() => setContentModal('')} />}
         </div>
@@ -298,8 +320,8 @@ export default function Admin(){
   );
 }
 
-function ProjectsTab({ content, setContent, project, projectIndex, setProjectIndex, updateProject, updateList, addListItem, removeListItem, sync, imageOptions, saving, onSave }){
-  return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Works" items={content.projects} active={projectIndex} onSelect={setProjectIndex} onAdd={() => { setContent(current => sync({ ...current, projects: [...current.projects, { ...emptyProject }] })); setProjectIndex(content.projects.length); }} label={item => item.name} sublabel={item => `${item.status || 'draft'} · ${item.location || 'No location'}`} />{project && <Editor title={project.name || 'Work'}><ProjectFields project={project} tags={content.tags} onChange={updateProject}/><Preview image={project.image} title={project.name} text={project.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Work name"><TextInput value={project.name || ''} onChange={event => updateProject('name', event.target.value)} /></Field><Field label="Slug"><TextInput value={project.slug || ''} onChange={event => updateProject('slug', event.target.value)} /></Field><ProjectStatusControl value={project.status || 'ongoing'} onChange={value => updateProject('status', value)} /><Field label="Location"><TextInput value={project.location || ''} onChange={event => updateProject('location', event.target.value)} /></Field><Field label="Area"><TextInput value={project.area || ''} onChange={event => updateProject('area', event.target.value)} /></Field><Field label="Client / owner"><TextInput value={project.client || ''} onChange={event => updateProject('client', event.target.value)} /></Field></div><div className="grid gap-4"><ImageField label="Primary image" value={project.image || ''} onChange={value => updateProject('image', value)} imageOptions={imageOptions} /><ImageListPicker label="Additional work images" values={project.secondaryImages || (project.secondaryImage ? [project.secondaryImage] : [])} onChange={value => updateProject('secondaryImages', value)} imageOptions={imageOptions} /></div><Field label="Short card summary"><TextArea rows={3} value={project.summary || ''} onChange={event => updateProject('summary', event.target.value)} /></Field><Field label="Work detail text"><TextArea rows={5} value={project.details || ''} onChange={event => updateProject('details', event.target.value)} /></Field><Repeat title="Scope" items={project.scope || []} kind="scope" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><div className="flex flex-wrap gap-3"><Button onClick={() => onSave()} disabled={saving}>{saving ? 'Saving…' : 'Save Work Changes'}</Button><Button tone="danger" onClick={() => { if(confirm('Delete this work?')) setContent(current => sync({ ...current, projects: current.projects.filter((_, i) => i !== projectIndex) })); }}>Delete work</Button></div></Editor>}</section>;
+function ProjectsTab({ content, setContent, project, projectIndex, setProjectIndex, updateProject, updateList, addListItem, removeListItem, sync, imageOptions, saving, onSave, onDelete }){
+  return <section className="grid gap-5 lg:grid-cols-[300px_1fr]"><ItemList title="Works" items={content.projects} active={projectIndex} onSelect={setProjectIndex} onAdd={() => { setContent(current => sync({ ...current, projects: [...current.projects, { ...emptyProject }] })); setProjectIndex(content.projects.length); }} label={item => item.name} sublabel={item => `${item.status || 'draft'} · ${item.location || 'No location'}`} />{project && <Editor title={project.name || 'Work'}><ProjectFields project={project} tags={content.tags} onChange={updateProject}/><Preview image={project.image} title={project.name} text={project.summary} /><div className="grid gap-4 md:grid-cols-2"><Field label="Work name"><TextInput value={project.name || ''} onChange={event => updateProject('name', event.target.value)} /></Field><Field label="Slug"><TextInput value={project.slug || ''} onChange={event => updateProject('slug', event.target.value)} /></Field><ProjectStatusControl value={project.status || 'ongoing'} onChange={value => updateProject('status', value)} /><Field label="Location"><TextInput value={project.location || ''} onChange={event => updateProject('location', event.target.value)} /></Field><Field label="Area"><TextInput value={project.area || ''} onChange={event => updateProject('area', event.target.value)} /></Field><Field label="Client / owner"><TextInput value={project.client || ''} onChange={event => updateProject('client', event.target.value)} /></Field></div><div className="grid gap-4"><ImageField label="Primary image" value={project.image || ''} onChange={value => updateProject('image', value)} imageOptions={imageOptions} /><ImageListPicker label="Additional work images" values={project.secondaryImages || (project.secondaryImage ? [project.secondaryImage] : [])} onChange={value => updateProject('secondaryImages', value)} imageOptions={imageOptions} /></div><Field label="Short card summary"><TextArea rows={3} value={project.summary || ''} onChange={event => updateProject('summary', event.target.value)} /></Field><Field label="Work detail text"><TextArea rows={5} value={project.details || ''} onChange={event => updateProject('details', event.target.value)} /></Field><Repeat title="Scope" items={project.scope || []} kind="scope" onAdd={addListItem} onUpdate={updateList} onRemove={removeListItem} /><div className="flex flex-wrap gap-3"><Button onClick={() => onSave()} disabled={saving}>{saving ? 'Saving…' : 'Save Work Changes'}</Button><Button tone="danger" onClick={onDelete} disabled={saving}>{saving ? 'Deleting…' : 'Delete work'}</Button></div></Editor>}</section>;
 }
 
 function ContentManager({ content, onOpen }){

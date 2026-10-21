@@ -46,6 +46,39 @@ export default async function handler(req, res){
     }
   }
 
-  res.setHeader('Allow', 'GET, POST');
+  if(req.method === 'DELETE'){
+    res.setHeader('Cache-Control', 'no-store');
+    if(!authorized(req)){
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const projectSlug = String(req.query?.projectSlug || '').trim();
+    if(!projectSlug){
+      return res.status(400).json({ error: 'A work URL slug is required to delete a work.' });
+    }
+
+    try{
+      // Works live in the single durable CMS document. Delete the matching
+      // record from that document and write it back immediately; do not fall
+      // back to bundled default projects, which could make a deleted record
+      // appear to return after a refresh.
+      const storedContent = await readStoredContent();
+      if(!storedContent){
+        return res.status(404).json({ error: 'No saved CMS content was found.' });
+      }
+      const current = migrate(storedContent);
+      const projects = current.projects.filter(project => project.slug !== projectSlug);
+      if(projects.length === current.projects.length){
+        return res.status(404).json({ error: 'The requested work no longer exists.' });
+      }
+      const content = normalizeContent({ ...current, projects });
+      await writeDatabaseContent(content);
+      return res.status(200).json({ ok: true, content, deletedSlug: projectSlug });
+    }catch(error){
+      return res.status(error.statusCode || 400).json({ error: error.message || 'Unable to delete the work.' });
+    }
+  }
+
+  res.setHeader('Allow', 'GET, POST, DELETE');
   return res.status(405).json({ error: 'Method not allowed' });
 }
