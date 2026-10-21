@@ -61,7 +61,7 @@ function ProjectDetails({ project, previous, next }) {
         </dl>
         {project.scope?.length > 0 && <div className="ns-project-scope"><p className="ns-overline">Scope of work</p><ul>{project.scope.map(item => <li key={item}>{item}</li>)}</ul></div>}
       </div>
-      <div className="ns-project-image-stack"><Carousel slides={images} controls={images.length > 1} duration={3} transition={0.6} fit="contain" onImageClick={(_, index) => setLightboxIndex(index)} /></div>
+      <div className="ns-project-image-stack"><Carousel slides={images} controls={images.length > 1} duration={3} transition={0.6} fit="contain" sizes="(max-width: 760px) 100vw, 50vw" onImageClick={(_, index) => setLightboxIndex(index)} /></div>
     </section>
     {lightboxIndex !== null && <ImageLightbox images={images} initialIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}
   </>;

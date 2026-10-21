@@ -4,7 +4,7 @@ import { Layout, ContactCTA, useContent } from '../components/Public';
 
 const assetUrl = url => /^(https?:\/\/|\/)/i.test(url || '') ? url : `/${url}`;
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, priority = false }) {
   const additionalImages = Array.isArray(project.secondaryImages) ? project.secondaryImages : [];
   const slides = [project.image, ...additionalImages, project.secondaryImage]
     .filter(Boolean)
@@ -16,7 +16,7 @@ function ProjectCard({ project }) {
   return (
     <article className="ns-work">
       <a className="ns-work-card-link" href={`/works/${project.slug}`} aria-label={`View ${project.name} project details`}>
-        <Carousel slides={slides} controls={false} duration={6} transition={0.6} />
+        <Carousel slides={slides} controls={false} duration={6} transition={0.6} priority={priority} sizes="(max-width: 420px) 88vw, (max-width: 650px) 43vw, (max-width: 1050px) 29vw, 18vw" />
         <div className="ns-work-details">
           <h2>{project.name}</h2>
           <p className="ns-work-location">{project.location}</p>
@@ -53,7 +53,7 @@ export default function Works() {
       </section>
 
       <section className="ns-works">
-        {projects.map(project => <ProjectCard key={project.slug} project={project} />)}
+        {projects.map((project, index) => <ProjectCard key={project.slug} project={project} priority={index === 0} />)}
         {data && !projects.length && <p className="ns-empty">No works match this selection. Clear your search or choose another tag.</p>}
       </section>
       <ContactCTA />

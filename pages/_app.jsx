@@ -18,9 +18,6 @@ export default function App({ Component, pageProps }){
       <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       <link rel="apple-touch-icon" href="/favicon.svg" />
       <link rel="stylesheet" href="/shared-system.css" />
-      <link rel="preconnect" href="https://www.google.com" />
-      <link rel="preconnect" href="https://maps.googleapis.com" />
-      <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
     </Head>
     <Script id="ns-page-loader" strategy="beforeInteractive">{`
       document.documentElement.classList.add('ns-page-loading');

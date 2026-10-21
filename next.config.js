@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: false,
+  images: {
+    // Next serves modern formats when the browser supports them, while
+    // retaining a compatible fallback for older clients.
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }
+    ]
+  },
   async redirects(){
     return [
       { source: '/index.html', destination: '/', permanent: true },
