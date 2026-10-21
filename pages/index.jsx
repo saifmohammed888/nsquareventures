@@ -234,7 +234,7 @@ body{background:#f7f7f4;color:#161b19}
 	 </div>
 	 <div class="process-visual">
 	  <div class="drawing-panel" aria-label="Architectural drawing"></div>
-	  <img src="Images/Sayeed Apartment - Yaseen Nagar.png" alt="Completed N Square Ventures project">
+	  <img src="/_next/image?url=%2FImages%2FSayeed%20Apartment%20-%20Yaseen%20Nagar.png&w=828&q=75" srcSet="/_next/image?url=%2FImages%2FSayeed%20Apartment%20-%20Yaseen%20Nagar.png&w=384&q=75 384w, /_next/image?url=%2FImages%2FSayeed%20Apartment%20-%20Yaseen%20Nagar.png&w=640&q=75 640w, /_next/image?url=%2FImages%2FSayeed%20Apartment%20-%20Yaseen%20Nagar.png&w=828&q=75 828w" sizes="(max-width: 1100px) 100vw, 50vw" width="972" height="1334" loading="lazy" decoding="async" alt="Completed N Square Ventures project">
 	 </div>
 	 <div class="process-foot"><div class="eyebrow">From drawing<br>to reality</div><p>Ideas take shape through collaboration, technical precision and shared commitment. The same team carries the project from concept, approvals and detailing into execution.</p></div>
 	</section>

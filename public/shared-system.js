@@ -128,9 +128,14 @@ function nsEscape(value){
     .replace(/"/g, '&quot;');
 }
 
-function nsImage(src, alt, className){
+function nsImage(src, alt, className, options = {}){
+  const source = /^(https?:\/\/|\/)/i.test(src || '') ? src : `/${src || ''}`;
+  const widths = [256, 384, 640, 828, 1080];
+  const optimized = width => `/_next/image?url=${encodeURIComponent(source)}&w=${width}&q=75`;
+  const sizes = options.sizes || '100vw';
+  const priority = Boolean(options.priority);
   const classes = ['cms-lazy-image', className].filter(Boolean).join(' ');
-  return `<img class="${classes}" src="${nsEscape(src)}" alt="${nsEscape(alt)}" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')" onerror="this.classList.add('is-loaded','is-broken')">`;
+  return `<img class="${classes}" src="${nsEscape(optimized(828))}" srcset="${widths.map(width => `${nsEscape(optimized(width))} ${width}w`).join(', ')}" sizes="${nsEscape(sizes)}" alt="${nsEscape(alt)}" loading="${priority ? 'eager' : 'lazy'}"${priority ? ' fetchpriority="high"' : ''} decoding="async" onload="this.classList.add('is-loaded')" onerror="this.classList.add('is-loaded','is-broken')">`;
 }
 
 function nsPrepareImage(img){
@@ -371,13 +376,13 @@ nsBindProjectFilters();
     if(homeGrid){
       const ongoing = projects.filter(project => nsProjectStatus(project) === 'ongoing').slice(0, 5);
       const completed = projects.filter(project => nsProjectStatus(project) === 'completed').slice(0, 5);
-      const card = project => `
+      const card = (project, index) => `
         <a class="card" href="/works/${encodeURIComponent(project.slug)}">
-          <div class="card-image cms-image-shell">${nsImage(project.image, project.name)}</div>
+          <div class="card-image cms-image-shell">${nsImage(project.image, project.name, '', { priority: index === 0, sizes: '(max-width: 560px) 88vw, (max-width: 1100px) 44vw, 30vw' })}</div>
           <div class="card-info"><h3>${nsEscape(project.name)}</h3><p>${nsEscape(project.summary)}</p><div class="project-meta"><span><b>Client</b>${nsEscape(project.client)}</span><span><b>Location</b>${nsEscape(project.location)}</span><span><b>Area</b>${nsEscape(project.area)}</span></div><span class="arrow">→</span></div>
         </a>
       `;
-      homeGrid.innerHTML = `<div class="project-group">Ongoing Works</div>${ongoing.map(card).join('')}<div class="project-group">Completed Works</div>${completed.map(card).join('')}`;
+      homeGrid.innerHTML = `<div class="project-group">Ongoing Works</div>${ongoing.map(card).join('')}<div class="project-group">Completed Works</div>${completed.map((project, index) => card(project, index + ongoing.length)).join('')}`;
       nsInitImageLoading(homeGrid);
     }
 
