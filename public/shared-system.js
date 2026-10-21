@@ -1,5 +1,5 @@
 (function(){
-  document.querySelectorAll('a[href="/journal"],a[href="/gallery"],a[href="/project-detail"],a[href="/presentation"]').forEach(link => link.remove());
+  document.querySelectorAll('a[href="/journal"],a[href="/project-detail"],a[href="/presentation"]').forEach(link => link.remove());
   const triggerSelectors = ['.site-menu-trigger', '#menuOpen', '.menu-dot', '.dot'];
   const triggers = [...document.querySelectorAll(triggerSelectors.join(','))];
   const side = document.getElementById('siteSide') || document.getElementById('side');

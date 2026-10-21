@@ -40,7 +40,7 @@ export default function Contact() {
 
             <div className="ns-contact-detail">
               <span>Email</span>
-              <a href="mailto:nquareventures@gmail.com">nquareventures@gmail.com</a>
+              <a href="mailto:nsquareprojects@gmail.com">nsquareprojects@gmail.com</a>
             </div>
 
             <div className="ns-contact-detail">
@@ -95,7 +95,7 @@ export default function Contact() {
             </div>
 
             <button className="ns-contact-submit" type="submit">
-              Continue on WhatsApp <span aria-hidden="true">→</span>
+              Send on WhatsApp <span aria-hidden="true">→</span>
             </button>
             <p className="ns-contact-form-note">
               This opens a prefilled WhatsApp message for you to review and send.

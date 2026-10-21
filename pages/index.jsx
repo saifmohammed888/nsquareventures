@@ -181,7 +181,7 @@ body{background:#f7f7f4;color:#161b19}
 <div class="shell">
 <header class="header">
   <a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a>
-  <nav class="nav" aria-label="Primary"><a href="/works">Works</a><a href="/office">Office</a><a href="/contact">Contact</a></nav>
+  <nav class="nav" aria-label="Primary"><a href="/works">Works</a><a href="/gallery">Gallery</a><a href="/office">Office</a><a href="/contact">Contact</a></nav>
   <!-- <div class="head-actions"><button class="menu-btn" id="menuOpen" aria-label="Open menu">Menu &nbsp; ↗</button></div> -->
   <div class="head-actions"><button class="menu-dot site-menu-trigger" type="button" aria-label="Open navigation">≡</button></div>
 </header>
@@ -241,7 +241,7 @@ body{background:#f7f7f4;color:#161b19}
 	<div id="homeContact"></div><footer class="footer site-footer" id="footer">
 	 <div class="footer-main site-footer-grid">
 	  <div class="site-footer-brand"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><p>Architecture, interiors and construction<br>in Bengaluru.</p></div>
-	  <nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/works">Works</a><a href="/office">Office</a><a href="/contact">Contact</a></nav>
+  <nav class="footer-links site-footer-col" aria-label="Footer explore"><h2>Explore</h2><a href="/works">Works</a><a href="/gallery">Gallery</a><a href="/office">Office</a><a href="/contact">Contact</a></nav>
 	  <div class="site-footer-col"><h2>Practice</h2><a href="/office">Architecture</a><a href="/office">Interiors</a><a href="/office">Construction</a></div>
 	  <div class="footer-contact site-footer-location"><h2>Based In</h2><strong>Bengaluru<br>Karnataka<br>India</strong><a href="/contact">Start a conversation <span>→</span></a></div>
 	 </div>
@@ -253,7 +253,7 @@ body{background:#f7f7f4;color:#161b19}
 <aside class="side site-side" id="side" aria-hidden="true">
  <div class="side-top site-side-top"><a class="brand" href="/"><span class="mark">N</span><span>NSQUARE<small>VENTURES</small></span></a><button class="close site-close" id="menuClose" type="button">Close &nbsp; ×</button></div>
  <div class="side-label site-side-label">Menu</div>
- <nav class="site-side-nav"><a href="/works">Works <span>01</span></a><a href="/office">Office <span>02</span></a><a href="/contact">Contact <span>03</span></a></nav>
+ <nav class="site-side-nav"><a href="/works">Works <span>01</span></a><a href="/gallery">Gallery <span>02</span></a><a href="/office">Office <span>03</span></a><a href="/contact">Contact <span>04</span></a></nav>
  <div class="side-art"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-cms-image="navigationMenuImage" data-fallback-src="Images/wireframe.jpg" alt=""><div class="side-words">Spaces<br>for a<br>better<br>tomorrow</div></div>
  <div class="side-foot site-side-foot"><div>Instagram<br>LinkedIn<br>YouTube</div><div class="cross site-cross" aria-hidden="true"></div></div>
 </aside>
