@@ -172,7 +172,13 @@ export default function Admin(){
   function logout(){ sessionStorage.removeItem('nsquare_cms_password'); setAuthed(false); setPassword(''); setStatus('Locked.'); }
 
   function updateProject(key, value){
-    setContent(current => sync({ ...current, projects: current.projects.map((item, index) => index === projectIndex ? { ...item, [key]: value, ...(key === 'name' && !item.slug ? { slug: slugify(value) } : {}) } : item) }));
+    setContent(current => sync({ ...current, projects: current.projects.map((item, index) => {
+      if(index !== projectIndex) return item;
+      const change = key === 'secondaryImages'
+        ? { secondaryImages: Array.isArray(value) ? value : [], secondaryImage: '' }
+        : { [key]: value };
+      return { ...item, ...change, ...(key === 'name' && !item.slug ? { slug: slugify(value) } : {}) };
+    }) }));
   }
 
   function updateArticle(key, value){
