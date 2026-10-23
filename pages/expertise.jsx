@@ -57,7 +57,7 @@ export default function Office() {
       </section>
 
       {data ? <>
-        <PeopleSection title="Associates" eyebrow="Office" people={data.associates} variant="ns-office-associates-grid" />
+        <PeopleSection title="Leadership" eyebrow="Office" people={data.associates} variant="ns-office-leadership-grid" intro="The leadership and trusted specialists who guide design, coordination and delivery across the practice." />
         <PeopleSection title="Staff" eyebrow="N Square Ventures" people={data.staff} variant="ns-office-staff-grid" intro="The in-house team supporting planning, interiors, drawings, coordination and project delivery." />
       </> : <p className="ns-heading" role="status">{error || 'Loading the office…'}</p>}
       <ContactCTA />

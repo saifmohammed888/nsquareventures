@@ -332,7 +332,7 @@ function ContentManager({ content, onOpen }){
     ['Home hero', 'Hero slideshow and home introduction', 'Home'],
     ['Page hero sections', 'Works, Office and Contact headings, copy and hero imagery', 'Page Heroes'],
     ['Work tags', `${content.tags?.length || 0} managed tags`, 'Tags'],
-    ['Associates', `${content.associates?.length || 0} associate records`, 'Associates'],
+    ['Leadership', `${content.associates?.length || 0} leadership records`, 'Leadership'],
     ['Staff', `${content.staff?.length || 0} staff records`, 'Staff'],
     ['Presentation', 'Presentation images, ordering, timing and display fit', 'Presentation'],
     ['Media visibility', 'Public and presentation eligibility for media', 'Media visibility']

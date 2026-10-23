@@ -91,6 +91,7 @@
 
   .ns-office-people-grid,
   .ns-office-associates-grid,
+  .ns-office-leadership-grid,
   .ns-office-staff-grid { grid-template-columns: 1fr !important; max-width: none !important; margin: 0 !important; }
   .ns-office-associates-grid .ns-office-person-card:first-child { grid-column: auto !important; display: flex !important; }
   .ns-office-associates-grid .ns-office-person-card:first-child > img { min-height: 0 !important; height: 300px !important; }
